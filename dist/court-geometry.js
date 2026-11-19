@@ -18,7 +18,10 @@ export function galleryCollision(old,b,galleries=GALLERIES,radius=.095){if(b.x>=
 }
 
 // Modest spring and a rounded valley seam; all impacts still lose energy.
-export function roofBounce(b,n){if(b.x<COURT.roofInnerX&&b.x>COURT.roofOuterX&&Math.abs(b.z)>(b.z>0?COURT.halfLength:COURT.endRoofInner)&&Math.abs(b.z)<(b.z>0?COURT.halfLength+(COURT.halfLength-COURT.endRoofInner):COURT.halfLength)){const gap=sideRoofHeight(b.x)-endRoofHeight(b.z);if(Math.abs(gap)<.10){const slope=(COURT.roofHigh-COURT.roofLow)/(COURT.roofInnerX-COURT.roofOuterX),w=(gap/.10+1)/2,length=Math.hypot(slope*w,1,slope*(1-w));n={x:slope*w/length,y:1/length,z:-Math.sign(b.z)*slope*(1-w)/length};}}if(!reflect(b,n,.42))return false;const normal=b.vx*n.x+b.vy*(n.y||0)+b.vz*(n.z||0);b.vx=normal*n.x+(b.vx-normal*n.x)*.90;b.vy=normal*(n.y||0)+(b.vy-normal*(n.y||0))*.90;b.vz=normal*(n.z||0)+(b.vz-normal*(n.z||0))*.90;return true;}
+export function roofBounce(b,n){if(b.x<COURT.roofInnerX&&b.x>COURT.roofOuterX&&Math.abs(b.z)>(b.z>0?COURT.halfLength:COURT.endRoofInner)&&Math.abs(b.z)<(b.z>0?COURT.halfLength+(COURT.halfLength-COURT.endRoofInner):COURT.halfLength)){const gap=sideRoofHeight(b.x)-endRoofHeight(b.z);if(Math.abs(gap)<.10){const slope=(COURT.roofHigh-COURT.roofLow)/(COURT.roofInnerX-COURT.roofOuterX),w=(gap/.10+1)/2,length=Math.hypot(slope*w,1,slope*(1-w));n={x:slope*w/length,y:1/length,z:-Math.sign(b.z)*slope*(1-w)/length};}}if(!reflect(b,n,.42))return false;const normal=b.vx*n.x+b.vy*(n.y||0)+b.vz*(n.z||0);b.vx=normal*n.x+(b.vx-normal*n.x)*.90;b.vy=normal*(n.y||0)+(b.vy-normal*(n.y||0))*.90;b.vz=normal*(n.z||0)+(b.vz-normal*(n.z||0))*.90;
+// Dull balls compress on a hard end-penthouse impact instead of springing vertically out.
+// Scale the whole outgoing velocity so this dissipates energy and preserves its exit direction.
+if(Math.abs(n.z||0)>.01&&b.vy>4.2){const rise=4.2+1-Math.exp(-(b.vy-4.2)/3),damping=rise/b.vy;b.vx*=damping;b.vy*=damping;b.vz*=damping;}return true;}
 
 export const STANDARD_SERVE={x:-2.6,y:1.9,z:6,vx:-6.75,vy:4.5,vz:-10};
 

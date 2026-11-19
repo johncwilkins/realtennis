@@ -25,8 +25,8 @@ export function contactShot(ball,player,side,power,preferredHand=0,kind='regular
  // Forward and right are relative to the player's end, so direction remains correct after changing ends.
  const ahead=(ball.z-player.z)*-side,right=(ball.x-player.x)*side,hand=Math.abs(right)<.2&&preferredHand?preferredHand:right<0?-1:1;const timingError=Math.sign(ahead)*Math.max(0,Math.abs(ahead)-.45);const steer=-hand*clamp(timingError/1.15,-1,1),angle=steer*(side*steer>0?.62:.42);const speed=10+12*clamp(power,0,1)**.85;
  // Launch from the racket face, without a net-height solver or clearance correction.
- const loft=kind==='lob',depthLift=clamp((Math.abs(ball.z)-6)*.65,0,6),lowLift=clamp((.85-ball.y)*4,-2.5,3);
- const drive=kind==='drive',p=clamp(power,0,1);let elevation=clamp((drive?11:12)+depthLift+lowLift+clamp(ahead,-1.6,1.6)*1.2,drive?6:8,22);
+ const loft=kind==='lob',depthLift=clamp((Math.abs(ball.z)-6)*.60,0,6),lowLift=clamp((.85-ball.y)*4,-2.5,3);
+ const drive=kind==='drive',p=clamp(power,0,1);let elevation=clamp((drive?10:11.5)+depthLift+lowLift+clamp(ahead,-1.6,1.6)*1.2,drive?6:8,22);
  const horizontal=loft?8+5*p+clamp((Math.abs(ball.z)-7)*.45,0,3):drive?Math.min(24,speed*1.16):speed;
  const vy=loft?7.2+2.2*p+clamp(ahead,-1.6,1.6)*.12:horizontal*Math.tan(elevation*Math.PI/180);if(loft)elevation=Math.atan2(vy,horizontal)*180/Math.PI;
  return {vx:side*Math.sin(angle)*horizontal,vy,vz:-side*Math.cos(angle)*horizontal,ahead,angle,speed:Math.hypot(horizontal,vy),hand,cut:loft?.1:.55,kind:loft?'lob':drive?'drive':'regular',elevation};

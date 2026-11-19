@@ -7,7 +7,7 @@ export function expendEnergy(energy,c,{distance=0,acceleration=0,stroke=null}={}
 export function recoveryAmount({changed=false,kind='point'}={}){return (changed?.18:0)+(kind==='set'?1.12:kind==='game'?.12:0);}
 export const recoverEnergy=(energy,event)=>clamp(energy+recoveryAmount(event),0,100);
 export function skillShot(velocity,from,profile,rally=0,random=Math.random,{errors=true}={}){const spread=(.006+.060*(1-unit(profile.accuracy)))*(1+.45*profile.fatigue),yaw=(random()*2-1)*spread,cos=Math.cos(yaw),sin=Math.sin(yaw);let result={...velocity,vx:velocity.vx*cos-velocity.vz*sin,vz:velocity.vx*sin+velocity.vz*cos};
- const chance=.12*(1-unit(profile.consistency))**2+.008*profile.fatigue;if(errors&&rally>=3&&random()<chance){const t=Math.abs(from.z/result.vz);if(t>.2&&t<2.5)result={...result,vy:Math.min(result.vy,((.45+random()*.25)-from.y+4.905*t*t)/t),unforcedError:true};}return result;}
+ const chance=.004+.12*(1-unit(profile.consistency))**2+.008*profile.fatigue;if(errors&&rally>=3&&random()<chance){const t=Math.abs(from.z/result.vz);if(t>.2&&t<2.5)result={...result,vy:Math.min(result.vy,((.45+random()*.25)-from.y+4.905*t*t)/t),unforcedError:true};}return result;}
 export function chaseAdvice(c,match,side){if(c.ratings.intelligence<50||!match.playing?.length)return '';const chase=match.playing[0],name=chaseCall(chase);return chase.owner===0?`Defend “${name}”: make him stretch.`:`Beat “${name}”: finish your second bounce closer to the back wall.`;}
 
 // A fast ball crowding the torso forces a cramped block rather than a clean swing.
