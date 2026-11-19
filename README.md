@@ -284,3 +284,13 @@ Validation: all 29 check files pass. New coverage ray-tests bare brick including
 ### Visitor analytics
 
 The game loads GoatCounter asynchronously using `https://realtennis.goatcounter.com/count`. Page views are recorded by the standard GoatCounter script; no custom player names, ratings, saved settings or gameplay events are sent. Dashboard: https://realtennis.goatcounter.com . Analytics blocking does not prevent the game from starting.
+
+### Fixed service reminder, spectator coverage and readable chase numbers
+
+The serve reminder is now a compact two-row panel fixed at the bottom center of the court. It appears only for a ready human server, remembers the previous style/length, and leaves canvas left-click service intact: ignoring the panel and clicking the court starts the saved serve. Movement no longer changes its screen position. The tutorial uses the new location and explains that drives hit harder and cost more energy in matches; practice/tutorial energy remains full.
+
+Spectator idle motion and point applause now discover all visible spectator rigs in the scene, without filtering by court number. Both existing spectator courts (4 and 7), and any subsequently added spectator group, use the same animation path. Hidden viewing rooms are skipped and paused time does not advance movement.
+
+The eight numbered chase marks retain their existing measured coordinates: six service-end yard marks and two hazard marks measured from the service line. Numbers sit near the foot of the wall and face the actual camera from their wall-side anchors, with enough inset to keep the full glyph clear of the wall. Far-end glyphs scale down to avoid crowding between adjacent yard lines. The former fixed end-dependent cant foreshortened the hazard view. Numbering does not reverse when ends change; the main wall appears on the left when looking from the hazard end.
+
+Validation: all 30 checks pass, including actual canvas click-away service, fixed CSS positioning, visible/hidden spectator animation and pause behavior, precise yard offsets, inward-facing number normals and full-glyph wall clearance from both viewing ends. Browser QA confirmed the menu remains at the identical 520×116 bounding box while the player moves, clicking outside starts the previous Giraffe service, and Camden's numbers are readable from both ends. Screenshots: docs/court-fixed-serve-menu.jpg and docs/court-camden-hazard-numbers.jpg. Browser checks use the compatibility renderer; WebGL lighting remains unverified.
