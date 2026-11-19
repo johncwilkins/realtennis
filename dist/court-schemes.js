@@ -1,0 +1,24 @@
+import * as THREE from './three.module.js';
+import {COURT as C} from './court-geometry.js';
+export const COURT_SCHEMES={
+ '1':{name:'Court 1 · Parquet club',description:'The original worn parquet court, pale plaster and warm gallery lighting.',floor:'parquet',colors:{upper:'#d8d0ba',lower:'#9ca99c',roof:'#a19a83',wood:'#c6b08c',trim:'#a89c7e',ink:'#020302',tape:'#bfb99e',cord:'#252823',out:'#79483c'},sun:'#fff0d0'},
+ '2':{name:'Court 2 · Timber hall',description:'Inspired by your first photo: scuffed terracotta, charcoal walls, ivory plaster and warm timber.',floor:'terracotta',colors:{upper:'#eee9d7',lower:'#797973',roof:'#77776a',wood:'#5e6040',trim:'#395740',ink:'#272d29',tape:'#315745',cord:'#344a39',out:'#995447'},sun:'#ffe1aa'},
+ '5':{name:'Court 5 · Grey Expectations',description:'Grey hull walls and a red bootstripe, warm white topsides, teak decking, stainless portholes and a yacht-club gallery.',floor:'teak',colors:{upper:'#f0f0eb',lower:'#a4aaad',roof:'#c19c73',wood:'#d1ab80',trim:'#aebbc1',ink:'#242a2d',tape:'#f0eee4',cord:'#334448',out:'#bf3b35'},sun:'#edf5ff'},
+ '4':{name:'Court 4 · Scarlet gallery',description:'Inspired by your fourth photo: olive-grey walls, ivory upper walls, scarlet edging and elevated viewing windows.',floor:'mineral',colors:{upper:'#f3efdf',lower:'#7d8173',roof:'#5a6470',wood:'#34475b',trim:'#c94c38',ink:'#e1ded0',tape:'#c7c2ad',cord:'#27333b',out:'#df4c36'},sun:'#fff1d7'},
+ '7':{name:'Court 7 · Blue-trim match court',description:'From your match footage: orange-red floor, charcoal walls, powder-blue gallery frames, pale brickwork and tall daylight windows.',floor:'match-orange',colors:{upper:'#b9b0a0',lower:'#43494a',roof:'#787c6c',wood:'#83a9bd',trim:'#8bb5cf',ink:'#e8e8db',tape:'#91b9bd',cord:'#252b29',out:'#80abc2'},sun:'#f4f4df'},
+ '6':{name:'Court 6 · Camden brick & iron',description:'Baltimore warehouse brick, arched iron windows, forest-green steel trusses, warm lamps and a worn red-brown floor. Inspired by Camden Yards.',floor:'warehouse',colors:{upper:'#ac6548',lower:'#46594c',roof:'#606459',wood:'#355245',trim:'#bd8251',ink:'#f0e8d1',tape:'#72907f',cord:'#273b31',out:'#b97643'},sun:'#ffe7bd'},
+ '3':{name:'Court 3 · Clerestory club',description:'Inspired by your second photo: red and green painted court, dark slate walls, green trim and broad daylight windows.',floor:'red-green',colors:{upper:'#f3f4ed',lower:'#4f5b61',roof:'#727b70',wood:'#4d683d',trim:'#719450',ink:'#d8c795',tape:'#698b4e',cord:'#293b2b',out:'#719450'},sun:'#eff8ff'}
+};
+export function courtScheme(id){return COURT_SCHEMES[String(id)]??COURT_SCHEMES['1'];}
+export function readCourtScheme(storage){try{const id=storage.getItem('royal-court-scheme-v1');return COURT_SCHEMES[id]?id:'1';}catch{return '1';}}
+export function saveCourtScheme(storage,id){try{storage.setItem('royal-court-scheme-v1',COURT_SCHEMES[id]?id:'1');}catch{}}
+export function paintedFloorColor(id,x,z){return id==='7'?'#c75227':id==='6'?'#a26443':id==='5'?'#b28a61':id==='4'?'#6a7778':id==='3'&&z<C.serviceLineZ&&x<C.faultLineX?'#587a37':id==='3'?'#ac413b':'#b76e46';}
+export function paintedCourtTexture(id,anisotropy=1){const canvas=document.createElement('canvas');canvas.width=1024;canvas.height=2048;const ctx=canvas.getContext('2d');ctx.fillStyle=paintedFloorColor(id,0,0);ctx.fillRect(0,0,1024,2048);
+ if(id==='5'){for(let x=0;x<1024;x+=22){ctx.fillStyle=['#b99368','#b08a62','#c09c73','#ae875e'][Math.floor(x/22)%4];ctx.fillRect(x,0,21,2048);ctx.fillStyle='#343b36';ctx.fillRect(x+21,0,1,2048);for(let n=0;n<6;n++){ctx.strokeStyle='rgba(65,40,20,.09)';ctx.lineWidth=.6;ctx.beginPath();ctx.moveTo(x+3+n*3,0);ctx.bezierCurveTo(x+6+n*2,650,x+1+n*3,1400,x+3+n*3,2048);ctx.stroke();}for(let y=(Math.floor(x/22)%3)*310;y<2048;y+=930){ctx.fillStyle='#66544380';ctx.fillRect(x,y,21,1);}}}
+ // CanvasTexture's bottom row maps to the service end; green is the legal receiving box.
+ if(id==='3'){ctx.fillStyle=paintedFloorColor(id,-1,-12);const edge=(C.halfLength-C.serviceLineZ)/(2*C.halfLength)*2048;ctx.fillRect(0,edge,(C.faultLineX+5)/10*1024,2048-edge);}
+ let seed=4281;const rnd=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};
+ for(let n=0;n<42000;n++){ctx.fillStyle=rnd()>.5?'rgba(255,244,218,.028)':'rgba(28,20,14,.028)';ctx.fillRect(rnd()*1024,rnd()*2048,1+rnd()*5,.5+rnd()*2);}
+ for(let n=0;n<650;n++){const x=rnd()*1024,y=rnd()*2048;ctx.strokeStyle=n%3?'rgba(25,25,22,.14)':'rgba(237,216,181,.12)';ctx.lineWidth=.4+rnd()*1.8;ctx.beginPath();ctx.ellipse(x,y,3+rnd()*15,1+rnd()*4,rnd()*Math.PI,0,Math.PI*(.5+rnd()));ctx.stroke();}
+ for(let n=0;n<70;n++){const x=rnd()*1024,y=rnd()*2048;const g=ctx.createRadialGradient(x,y,0,x,y,25+rnd()*65);g.addColorStop(0,'rgba(35,25,20,.045)');g.addColorStop(1,'rgba(35,25,20,0)');ctx.fillStyle=g;ctx.fillRect(x-100,y-100,200,200);}
+ const map=new THREE.CanvasTexture(canvas);map.colorSpace=THREE.SRGBColorSpace;map.anisotropy=anisotropy;return map;}

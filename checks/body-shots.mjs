@@ -1,0 +1,14 @@
+import assert from 'node:assert/strict';
+import {crowdedReturn,athleteProfile} from '../dist/athlete.js';
+import {ROSTER} from '../dist/roster.js';
+import fs from 'node:fs';
+const p=athleteProfile(ROSTER[0]),player={x:0,z:7},shot={vx:0,vy:4,vz:-18,speed:18,kind:'drive'},incoming={x:.05,y:1,z:7.2,vx:0,vy:0,vz:23};
+const clean=crowdedReturn(shot,{...incoming,x:1},player,p,()=>1),soft=crowdedReturn(shot,{...incoming,vz:8},player,p,()=>1);
+assert.equal(clean,shot);assert.equal(soft,shot);
+const left=crowdedReturn(shot,incoming,player,p,()=>0),right=crowdedReturn(shot,incoming,player,p,()=>1);
+assert.ok(left.jammed&&right.jammed);assert.ok(left.vx*right.vx<0);assert.ok(left.vy<shot.vy&&right.vy>shot.vy-.1);assert.ok(right.speed<shot.speed);assert.ok(Number.isFinite(right.vy));
+assert.equal(crowdedReturn(shot,{...incoming,y:.1},player,p,()=>1),shot);
+const mirrored=crowdedReturn({...shot,vz:18},{...incoming,z:-7.2,vz:-23},{x:0,z:-7},p,()=>1);assert.ok(mirrored.jammed&&mirrored.vz>0);
+const tired=crowdedReturn(shot,incoming,player,{...p,fatigue:.4},()=>1);assert.ok(tired.speed<right.speed);
+const game=fs.readFileSync(new URL('../dist/game.js',import.meta.url),'utf8');assert.ok(game.indexOf('velocity=crowdedReturn')<game.indexOf('Object.assign(ball,{vx:velocity.vx'));assert.ok(game.includes('players[i].g.position,profileFor(i)'));
+console.log('Passed: hard body shots deflect with varied angle, height and softened pace for both ends; soft/well-spaced/low shots unchanged.');
