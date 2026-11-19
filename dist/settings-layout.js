@@ -1,5 +1,6 @@
 const $=s=>document.querySelector(s),tabs=[['playersTab','playersSettings'],['controlsTab','controlsSettings']];
 for(const [id,page]of tabs)$('#'+id).onclick=()=>{for(const [i,p]of tabs){$('#'+i).setAttribute('aria-selected',String(i===id));$('#'+p).hidden=p!==page;}};
-// Skills open separately so inspecting a player never pushes the start button off screen.
-const dialog=document.createElement('dialog');dialog.className='skills-dialog';dialog.innerHTML='<button aria-label="Close skills" class="skills-close">×</button><h2></h2><div class="skill-grid"></div><p>Ratings out of 100. Higher is better; high unforced errors means fewer mistakes.</p>';document.body.append(dialog);dialog.querySelector('button').onclick=()=>dialog.close();dialog.addEventListener('click',e=>{if(e.target===dialog)dialog.close();});
-for(const card of document.querySelectorAll('.roster-card'))card.querySelector('summary').onclick=e=>{e.preventDefault();dialog.querySelector('h2').textContent=card.querySelector('select').selectedOptions[0].textContent;dialog.querySelector('.skill-grid').replaceChildren(...Array.from(card.querySelector('.skill-grid').children,o=>o.cloneNode(true)));dialog.showModal();};
+// Native details remain inline and retain their open state while roster values update.
+for(const detail of document.querySelectorAll('.roster-card details'))detail.addEventListener('toggle',()=>{
+ $('#settingsModal').classList.toggle('skills-expanded',Array.from(document.querySelectorAll('.roster-card details')).some(d=>d.open));
+});
