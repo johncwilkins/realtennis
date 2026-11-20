@@ -1,34 +1,52 @@
 import * as THREE from './three.module.js';
 import {COURT as C,wallX} from './court-geometry.js';
 import {mainWallRuns,mainWallSurface,wallSurface,venueRear} from './venue-walls.js';
+export const SPHERE_WALL_HEIGHT=42;
 const savedUV=new WeakMap();
-export function sphereWallUV(p){const x=p.x+1.08,z=p.z-1;const u=.5+Math.atan2(z,x)/(2*Math.PI);return [u,.29+p.y*.047];}
+export function sphereWallUV(p){const x=p.x+1.08,z=p.z-1;const u=.5+Math.atan2(z,x)/(2*Math.PI);return [u,.12+.88*p.y/SPHERE_WALL_HEIGHT];}
 export function setSphereWallUV(mesh,active){const g=mesh.geometry,uv=g?.attributes.uv;if(!uv)return;if(!savedUV.has(g))savedUV.set(g,uv.array.slice());if(!active){uv.array.set(savedUV.get(g));uv.needsUpdate=true;return;}mesh.updateWorldMatrix(true,false);const p=g.attributes.position,v=new THREE.Vector3();for(let i=0;i<p.count;i++){v.fromBufferAttribute(p,i).applyMatrix4(mesh.matrixWorld);const [u,w]=sphereWallUV(v);uv.setXY(i,u,w);}uv.needsUpdate=true;}
-export const SPHERE_SHOWS=['Aurora ribbons','Star tunnel','Prismatic waves','Bioluminescent ocean'];
+export const SPHERE_SHOWS=['Nebula currents','Hyperspace lattice','Liquid prism','Bioluminescent depths'];
 export function sphereShow(time){const cycle=((time%96)+96)%96;return {index:Math.floor(cycle/24),next:(Math.floor(cycle/24)+1)%4,blend:Math.max(0,(cycle%24-20)/4)};}
 export function buildSphereHall(){
  const sides=new THREE.Group(),ends=[],walls=new THREE.Group();sides.add(walls);sides.userData.sphereHall=true;let time=0,last=-1,active=false;
  const canvas=typeof document!=='undefined'?document.createElement('canvas'):null;if(canvas){canvas.width=1536;canvas.height=768;}const ctx=canvas?.getContext('2d'),map=canvas?new THREE.CanvasTexture(canvas):null;if(map){map.colorSpace=THREE.SRGBColorSpace;map.userData.animated=true;map.wrapS=THREE.RepeatWrapping;}
- const screen=new THREE.MeshBasicMaterial({color:map?'#ffffff':'#1c4262',map,side:THREE.BackSide,fog:false});const dome=new THREE.Mesh(new THREE.SphereGeometry(49,64,32),screen);dome.position.set(-1.08,-5,1);dome.userData.immersiveScreen=true;sides.add(dome);
- // The display is on solid court walls as well as the surrounding dome.
+ // Tall planar display walls fill the view; there is no background dome.
  const upperDisplay=new THREE.MeshBasicMaterial({color:'#c4d4dc',map,side:THREE.DoubleSide,fog:false}),lowerDisplay=new THREE.MeshBasicMaterial({color:'#647d91',map,side:THREE.DoubleSide,fog:false});
  const uvAt=sphereWallUV;
  function panel(group,corners,material){const o=wallSurface(group,corners,material,uvAt);o.userData.sphereScreenWall=true;return o;}
- for(const run of mainWallRuns()){for(const [low,high,material]of [[3.4,8.25,upperDisplay]]){const o=mainWallSurface(walls,run,low,high,material,uvAt);o.userData.sphereScreenWall=true;}
-  // A narrow top cap and an out line make the wall plane readable against the dome.
+ for(const run of mainWallRuns()){for(const [low,high,material]of [[3.4,SPHERE_WALL_HEIGHT,upperDisplay]]){const o=mainWallSurface(walls,run,low,high,material,uvAt);o.userData.sphereScreenWall=true;}
+  // A narrow top cap and an out line make the wall plane readable against the animated wall.
   const edge=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(run.xa-.024,6.4,run.a),new THREE.Vector3(run.xb-.024,6.4,run.b)]),new THREE.LineBasicMaterial({color:'#7eaabb'}));walls.add(edge);
  }
- panel(walls,[[C.roofOuterX+.012,3.4,-C.halfLength],[C.roofOuterX+.012,3.4,venueRear],[C.roofOuterX+.012,8.25,venueRear],[C.roofOuterX+.012,8.25,-C.halfLength]],upperDisplay);
- for(const side of [-1,1]){const g=new THREE.Group();g.userData.endSide=side;const rear=side>0?venueRear:-C.halfLength,xr=wallX(rear),z=rear-side*.014;panel(g,[[C.roofOuterX,3.4,z],[xr,3.4,z],[xr,8.25,z],[C.roofOuterX,8.25,z]],upperDisplay);
+ panel(walls,[[C.roofOuterX+.012,3.4,-C.halfLength],[C.roofOuterX+.012,3.4,venueRear],[C.roofOuterX+.012,SPHERE_WALL_HEIGHT,venueRear],[C.roofOuterX+.012,SPHERE_WALL_HEIGHT,-C.halfLength]],upperDisplay);
+ for(const side of [-1,1]){const g=new THREE.Group();g.userData.endSide=side;const rear=side>0?venueRear:-C.halfLength,xr=wallX(rear),z=rear-side*.014;panel(g,[[C.roofOuterX,3.4,z],[xr,3.4,z],[xr,SPHERE_WALL_HEIGHT,z],[C.roofOuterX,SPHERE_WALL_HEIGHT,z]],upperDisplay);
   ends.push(g);
  }
  let seed=1237;const random=()=>{seed=(1664525*seed+1013904223)>>>0;return seed/4294967296;};const stars=Array.from({length:360},()=>({x:random()*1536,y:random()*768,r:.7+random()*2.2,p:random()*6.28}));
- function paint(show,t,alpha){const w=1536,h=768;ctx.save();ctx.globalAlpha=alpha;const gradient=ctx.createLinearGradient(0,0,0,h);const colors=[['#07172c','#11424c','#183647'],['#050c27','#1a164a','#12404c'],['#162447','#3d1c53','#142e48'],['#06182f','#124b68','#102e45']][show];gradient.addColorStop(0,colors[0]);gradient.addColorStop(.55,colors[1]);gradient.addColorStop(1,colors[2]);ctx.fillStyle=gradient;ctx.fillRect(0,0,w,h);
- if(show===0){for(let band=0;band<8;band++){ctx.beginPath();for(let x=0;x<=w;x+=12){const y=240+band*35+Math.sin(x*.005+t*.14+band*.4)*105+Math.sin(x*.013-t*.11)*24;if(x===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}ctx.strokeStyle=['#3da7a28a','#67cfbe77','#666cc075','#b464b170'][band%4];ctx.lineWidth=28+band*2;ctx.stroke();}}
- if(show===1){const cx=w*.5+Math.sin(t*.07)*130,cy=h*.44;for(let i=20;i>0;i--){const phase=(i/20+t*.018)%1,r=phase*phase*1000;ctx.beginPath();ctx.ellipse(cx,cy,r,r*.6,0,0,Math.PI*2);ctx.strokeStyle=i%2?'#6088bc88':'#65c6c377';ctx.lineWidth=2+phase*6;ctx.stroke();}for(const s of stars){const angle=s.x/w*6.28,rr=((s.y/h+t*.035)%1)**2*1000;ctx.fillStyle='#c7e3ea';ctx.beginPath();ctx.arc(cx+Math.cos(angle)*rr,cy+Math.sin(angle)*rr*.6,s.r,0,Math.PI*2);ctx.fill();}}
- if(show===2){for(let row=0;row<18;row++){ctx.beginPath();for(let x=0;x<=w;x+=16){const y=row*50+Math.sin(x*.009+t*.21+row*.5)*47;x?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.strokeStyle=`hsla(${185+row*5+Math.sin(t*.06)*25},58%,62%,.60)`;ctx.lineWidth=3;ctx.stroke();}for(let x=0;x<w;x+=96){ctx.beginPath();ctx.moveTo(x,0);ctx.bezierCurveTo(x+Math.sin(t*.1)*75,256,x-60,512,x+20,h);ctx.strokeStyle='#9896c936';ctx.stroke();}}
- if(show===3){const glow=ctx.createRadialGradient(1050,260,4,1050,260,200);glow.addColorStop(0,'#8fe3cc');glow.addColorStop(.15,'#387f8c');glow.addColorStop(1,'#14394d00');ctx.fillStyle=glow;ctx.fillRect(800,10,500,500);for(let row=0;row<34;row++){ctx.beginPath();for(let x=0;x<=w;x+=16){const y=350+row*13+Math.sin(x*.011+t*.27+row*.4)*(8+row*.6);x?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.strokeStyle=row%3?'#46aaa267':'#9bd7c978';ctx.lineWidth=1+row/26;ctx.stroke();}}
- if(show!==1)for(const s of stars){ctx.fillStyle=`rgba(188,220,228,${.35+.25*Math.sin(s.p+t*.15)})`;ctx.beginPath();ctx.arc(s.x,(s.y*.5+t*1.2)%350,s.r*.7,0,6.28);ctx.fill();}ctx.restore();}
+ function paint(show,t,alpha){const w=1536,h=768;ctx.save();ctx.globalAlpha=alpha;ctx.fillStyle='#030c1c';ctx.fillRect(0,0,w,h);
+ function glow(x,y,r,color){const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,color);g.addColorStop(.4,color.slice(0,7)+'75');g.addColorStop(1,color.slice(0,7)+'00');ctx.fillStyle=g;ctx.fillRect(x-r,y-r,r*2,r*2);}
+ const drift=t*.10;
+ if(show===0){
+  // Layered nebula clouds, hundreds of stars and fine luminous currents.
+  for(let i=0;i<9;i++)glow((i*239+Math.sin(drift+i)*95)%w,160+(i%3)*190+Math.cos(drift*.6+i)*75,230+i%3*60,['#17437b','#51428b','#146b76'][i%3]);
+  for(let layer=0;layer<32;layer++){ctx.beginPath();for(let x=0;x<=w;x+=12){const y=190+layer*12+Math.sin(x*.004+drift+layer*.055)*125+Math.sin(x*.011-drift*.7+layer*.10)*35;x?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.lineWidth=layer%5===0?2.4:1.1;ctx.strokeStyle=`hsla(${175+layer*3},68%,${45+layer%6*4}%,${layer%5===0?.65:.24})`;ctx.stroke();}
+ }
+ if(show===1){
+  const cx=w*.52+Math.sin(t*.04)*100,cy=h*.48;glow(cx,cy,410,'#19326c');glow(cx,cy,145,'#503a82');
+  for(let ring=0;ring<22;ring++){const p=(ring/22+t*.022)%1,r=30+p*p*1050,spin=t*.025+p*.7;ctx.beginPath();for(let n=0;n<=12;n++){const a=n/12*Math.PI*2+spin,x=cx+Math.cos(a)*r,y=cy+Math.sin(a)*r*.53;n?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.lineWidth=.7+p*2.5;ctx.strokeStyle=`hsla(${185+p*80},72%,65%,${.10+p*.55})`;ctx.stroke();}
+  for(let spoke=0;spoke<24;spoke++){const a=spoke/24*6.283+t*.025;ctx.beginPath();ctx.moveTo(cx+Math.cos(a)*30,cy+Math.sin(a)*16);ctx.lineTo(cx+Math.cos(a)*1300,cy+Math.sin(a)*690);ctx.strokeStyle='#5fbad42b';ctx.lineWidth=1;ctx.stroke();}
+ }
+ if(show===2){
+  for(let i=0;i<7;i++)glow(i*260+Math.sin(drift+i)*75,350+Math.sin(i+drift)*160,250,['#58346e','#155d78','#3569a0'][i%3]);
+  for(let row=0;row<42;row++){ctx.beginPath();for(let x=0;x<=w;x+=12){const y=row*22-70+Math.sin(x*.005+drift+row*.12)*90+Math.cos(x*.012-drift+row*.075)*35;x?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.strokeStyle=`hsla(${185+row*2.5+Math.sin(drift)*20},70%,${50+row%5*4}%,.6)`;ctx.lineWidth=row%7===0?3:1.1;ctx.stroke();}
+ }
+ if(show===3){
+  for(let i=0;i<6;i++)glow(i*320+Math.sin(drift+i)*80,220+Math.sin(i)*150,300,['#0b5263','#173d70','#204e62'][i%3]);
+  for(let row=0;row<30;row++){ctx.beginPath();for(let x=0;x<=w;x+=14){const y=150+row*22+Math.sin(x*.008+drift*1.3+row*.4)*(22+row*.6)+Math.cos(x*.017-drift*.5+row*.3)*15;x?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.strokeStyle=row%4?'#42a7ac55':'#8cdbcc99';ctx.lineWidth=row%4?1:2;ctx.stroke();}
+  for(let i=0;i<12;i++){const x=(i*157+Math.sin(drift+i)*70+w)%w,y=(i*79-t*6+h*10)%h;glow(x,y,12+i%3*5,'#5bcdc6');ctx.beginPath();ctx.moveTo(x,y);ctx.quadraticCurveTo(x+12,y+28,x-5,y+58);ctx.strokeStyle='#6ac7be88';ctx.lineWidth=1;ctx.stroke();}
+ }
+ for(const s of stars){const x=(s.x+Math.sin(s.p+t*.015)*8+w)%w,y=(s.y+t*(show===1?7:1.1))%h;ctx.fillStyle=`rgba(204,229,244,${.28+.24*Math.sin(s.p+t*.20)})`;ctx.beginPath();ctx.arc(x,y,s.r*(show===1?.7:.55),0,6.283);ctx.fill();if(s.r>2.5){ctx.fillStyle='#a7dbdf48';ctx.fillRect(x-3,y-.4,6,.8);}}
+ ctx.restore();}
  function update(dt){if(!active)return;time+=Math.max(0,dt);if(!ctx||Math.floor(time*10)===last)return;last=Math.floor(time*10);const state=sphereShow(time);paint(state.index,time,1);if(state.blend>0)paint(state.next,time,state.blend);map.needsUpdate=true;}
  if(ctx){paint(0,0,1);map.needsUpdate=true;}
  return {sides,ends,screenMap:map,shows:SPHERE_SHOWS,setVisible(on,overview=false){active=on;sides.visible=on;walls.visible=!overview;for(const g of ends)g.visible=on&&!overview;},setEndView(){},update};

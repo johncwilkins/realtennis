@@ -339,6 +339,6 @@ Validation: all 32 checks pass, including legal services and the existing roof/v
 
 ## Palestra and Sphere courts
 
-Court 9 uses navy wainscoting, red wall bands, recessed arched glazing, honey maple flooring and steel roof trusses. Court 10 puts its animated artwork on solid walls that follow the full tambour profile, with the surrounding dome continuing the show above. Select either in Settings → Players & match → Court. Augusta has been removed; a saved Augusta selection falls back to Court 1.
+Court 9 uses navy wainscoting, red wall bands, recessed arched glazing, honey maple flooring and steel roof trusses. Court 10 puts its animated artwork on solid walls that follow the full tambour profile, with tall walls filling the view and no background dome. Its four animated shows feature nebula currents, a hyperspace lattice, liquid-prism waves and bioluminescent depths. Select either in Settings → Players & match → Court. Augusta has been removed; a saved Augusta selection falls back to Court 1.
 
 Balls entering the dedans or grille stay on the opening’s lower sill through the point-ending pause. Racket heads have a longer, narrower offset shape. Lower-intelligence opponents sometimes anticipate a flat-wall rebound at the tambour, then hesitate before correcting after the actual ricochet.
