@@ -26,6 +26,11 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
+          name: pages-${{ github.run_id }}-${{ github.run_attempt }}
+      - name: Allow artifact metadata to settle
+        run: sleep 10
       - name: Publish
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          artifact_name: pages-${{ github.run_id }}-${{ github.run_attempt }}
