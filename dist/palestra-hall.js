@@ -1,0 +1,15 @@
+import * as THREE from './three.module.js';
+import {COURT as C} from './court-geometry.js';
+import {block,beam,finish,sign} from './venue-tools.js';
+export function buildPalestraHall(){
+ const sides=new THREE.Group(),ends=[],rafters=[],brick=finish('#b47857'),stone=finish('#dbcbb0'),navy=finish('#263c55'),red=finish('#a7333e'),maple=finish('#bc8d51'),steel=finish('#37505b',{metalness:.35}),glass=new THREE.MeshBasicMaterial({color:'#c8e0df',transparent:true,opacity:.68,side:THREE.DoubleSide}),lamp=new THREE.MeshBasicMaterial({color:'#ffe8bd'});
+ sides.userData.palestraHall=true;
+ // Stepped bleachers begin above the real-tennis penthouse; walls remain legal.
+ for(const side of [-1,1]){const x=side>0?5.16:-7.34;block(sides,.24,4.8,34,x,5.8,1.2,brick);for(let row=0;row<5;row++){const xx=x+side*(.15+row*.35);for(let z=-13.8;z<17;z+=3.8){block(sides,.65,.20,3.35,xx,3.55+row*.37,z,row%2?red:navy);block(sides,.06,.42,3.35,xx+side*.28,3.78+row*.37,z,row%2?red:navy);}}for(let z=-12.5;z<16;z+=4.8){block(sides,.14,2.8,.22,x-side*.06,7.05,z,stone);block(sides,.04,2.0,3.65,x-side*.14,7.04,z+2.2,glass);for(let k=0;k<4;k++)block(sides,.06,2.04,.035,x-side*.18,7.04,z+.55+k*.95,steel);block(sides,.18,.12,4.55,x-side*.05,8.16,z+2.2,stone);}}
+ for(const side of [-1,1]){const g=new THREE.Group(),z=side>0?17.12:-14.82;g.userData.endSide=side;block(g,12.6,5,.24,-1.08,5.85,z,brick);for(let row=0;row<4;row++){block(g,11.8,.22,.6,-1.08,3.6+row*.40,z+side*(.35+row*.42),row%2?navy:red);}for(const x of [-5.6,-2.6,.4,3.4]){const shape=new THREE.Shape();shape.moveTo(-.95,0);shape.lineTo(.95,0);shape.lineTo(.95,1.6);shape.absarc(0,1.6,.95,0,Math.PI);shape.lineTo(-.95,0);const window=new THREE.Mesh(new THREE.ShapeGeometry(shape,16),glass);window.position.set(x,5.4,z-side*.15);g.add(window);for(const dx of [-.95,0,.95])beam(g,[x+dx,5.4,z-side*.19],[x+dx,7.0+Math.sqrt(Math.max(0,.95*.95-dx*dx)),z-side*.19],.035,steel);for(let i=0;i<16;i++){const a=i*Math.PI/16,b=(i+1)*Math.PI/16;beam(g,[x+Math.cos(a)*.95,7+Math.sin(a)*.95,z-side*.19],[x+Math.cos(b)*.95,7+Math.sin(b)*.95,z-side*.19],.055,stone);}}
+ sign(g,'THE PALESTRA',-1.08,4.7,z-side*.22,5.3,'#f8e6bd','#22374f',side>0?Math.PI:0);ends.push(g);}
+ // Arched steel trusses are the recognizable fieldhouse silhouette.
+ for(let z=-13;z<18;z+=4.5){const g=new THREE.Group();g.userData.trussZ=z;rafters.push(g);sides.add(g);for(let i=0;i<18;i++){const x=-7.2+i*12.5/18,xx=x+12.5/18,top=X=>8.25+3.2*Math.sqrt(Math.max(0,1-((X+1)/6.3)**2));beam(g,[x,top(x),z],[xx,top(xx),z],.070,steel);beam(g,[x,top(x)-.48,z],[xx,top(xx)-.48,z],.045,steel);beam(g,[x,top(x)-.48,z],[xx,top(xx),z],.024,steel);}for(const x of [-4,1.9]){beam(g,[x,10.1,z],[x,8.5,z],.016,steel);block(g,.68,.08,.38,x,8.48,z,lamp);}}
+ sign(sides,'PENN',4.98,4.6,1.6,2,'#f9ead3','#a7333e',-Math.PI/2);
+ let active=false,overview=false;return {sides,ends,setVisible(on,over=false){active=on;overview=over;sides.visible=on;for(const g of ends)g.visible=on&&!over;},setEndView(side){for(const g of rafters)g.visible=active&&!overview&&g.userData.trussZ*side<2;},update(){}};
+}

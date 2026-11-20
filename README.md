@@ -334,3 +334,11 @@ Validation: all 32 checks pass, including legal services and the existing roof/v
 - Hidden-wall and roof impact reveals now last 1.1 seconds: a 0.2-second hold followed by a 0.9-second fade. Opacity remains 25%; another impact refreshes the reveal. The material checks verify visibility beyond the previous half-second duration, fading and reset at both ends.
 - Players have smaller adult-proportioned heads (including aligned headbands/caps), oval chests, softer cloth folds, flatter shorts waists, tapered legs, modeled polo collars and gripping hands. Face shading follows each character's skin. Skin beneath sleeves/shorts/socks is trimmed out to reduce visible mesh overlap. Rig motion, roster ratings and controls are retained.
 - Validation: all 33 existing checks pass. Browser QA inspected Court 8 in play and player close-ups in ready and backswing poses. Rendering here uses the existing software fallback; GPU lighting is not visually verified in this environment.
+
+
+
+## Palestra, Sphere and Augusta courts
+
+Court 9 is a Palestra-inspired fieldhouse with maple flooring, arched steelwork, high windows and red/navy seating. Court 10 is a Sphere-inspired immersive venue with four animated screen shows (aurora, star tunnel, geometric waves and ocean), fading between scenes during play. Court 11 is an Augusta-inspired garden with clubhouse verandas, green shutters, azaleas, pines and yellow flags. Select them in Settings → Players & match → Court. These are themed interpretations; the real-tennis playing dimensions and scoring remain the same.
+
+Balls entering the dedans or grille now stay on the opening’s lower sill through the point-ending pause. Racket heads have a longer, narrower, offset shape and a slightly more visible ready angle. Lower-intelligence opponents sometimes anticipate a flat-wall rebound at the tambour, then hesitate before correcting after the actual ricochet.
