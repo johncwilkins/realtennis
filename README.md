@@ -368,3 +368,5 @@ Playground graffiti also includes Lafayette Crew in maroon and cream.
 The preferred original Playground apartment style is retained, with subtle translucent window glazing, light brick weathering and a larger texture with varied curtains and air conditioners to reduce repetition.
 
 Playground apartments sit 3.2 m behind the fence line, with joined corners and retained fire escapes. A few projecting AC units have rusty brackets, dented lids and uneven louvers. Muted masonry and cool overcast light give the courtyard a more worn, subdued mood.
+
+The projecting and painted Playground AC units have been removed. Windowless brick bays close each apartment corner and end between complete window columns; the straight end apartment walls join the full courtyard width while the fencing retains its playing-wall profile.
