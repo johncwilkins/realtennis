@@ -6,11 +6,11 @@ const unitBox=new THREE.BoxGeometry(1,1,1),rodGeometry=new THREE.CylinderGeometr
 function block(g,w,h,d,x,y,z,m){const o=new THREE.Mesh(unitBox,m);o.scale.set(w,h,d);o.position.set(x,y,z);o.castShadow=o.receiveShadow=true;return add(g,o);}
 function beam(g,a,b,r=.035,m=iron){if(g.userData.overheadTrusses)m=truss;const A=new THREE.Vector3(...a),B=new THREE.Vector3(...b),delta=B.clone().sub(A),o=new THREE.Mesh(rodGeometry,m);o.position.copy(A).add(B).multiplyScalar(.5);o.scale.set(r,delta.length(),r);o.quaternion.setFromUnitVectors(up,delta.normalize());o.castShadow=true;return add(g,o);}
 function wall(span,centres,sideWall=false){const group=new THREE.Group(),outer=new THREE.Shape();outer.moveTo(-span/2,3.4);outer.lineTo(span/2,3.4);outer.lineTo(span/2,8.1);outer.lineTo(-span/2,8.1);outer.closePath();
-for(const u of centres){const w=.73,bottom=sideWall?6.15:4.45,spring=sideWall?6.72:6.45,path=new THREE.Path();path.moveTo(u-w,bottom);path.lineTo(u-w,spring);path.absarc(u,spring,w,Math.PI,0,true);path.lineTo(u+w,bottom);path.closePath();outer.holes.push(path);
+for(const u of centres){const w=.73,bottom=sideWall?4.95:4.45,spring=sideWall?6.75:6.45,path=new THREE.Path();path.moveTo(u-w,bottom);path.lineTo(u-w,spring);path.absarc(u,spring,w,Math.PI,0,true);path.lineTo(u+w,bottom);path.closePath();outer.holes.push(path);
 const paneShape=new THREE.Shape();paneShape.moveTo(u-w,bottom);paneShape.lineTo(u+w,bottom);paneShape.lineTo(u+w,spring);paneShape.absarc(u,spring,w,0,Math.PI,false);paneShape.lineTo(u-w,bottom);const pane=new THREE.Mesh(new THREE.ShapeGeometry(paneShape,12),glass);pane.position.z=-.12;pane.userData.warehouseWindow=true;pane.userData.sideWindow=sideWall;pane.userData.bottom=bottom;add(group,pane);
 beam(group,[u-w,bottom,.035],[u+w,bottom,.035],.045);for(const edge of [-1,1])beam(group,[u+edge*w,bottom,.035],[u+edge*w,spring,.035],.045);
 for(let a=0;a<Math.PI;a+=Math.PI/12)beam(group,[u+Math.cos(a)*w,spring+Math.sin(a)*w,.035],[u+Math.cos(a+Math.PI/12)*w,spring+Math.sin(a+Math.PI/12)*w,.035],.045);
-for(const dx of [-.24,.24])beam(group,[u+dx,bottom,.035],[u+dx,spring+Math.sqrt(w*w-dx*dx),.035],.022);for(const y of (sideWall?[6.72]:[5.13,5.8,6.45]))beam(group,[u-w,y,.035],[u+w,y,.035],.023);
+for(const dx of [-.24,.24])beam(group,[u+dx,bottom,.035],[u+dx,spring+Math.sqrt(w*w-dx*dx),.035],.022);for(const y of (sideWall?[5.6,6.2,6.75]:[5.13,5.8,6.45]))beam(group,[u-w,y,.035],[u+w,y,.035],.023);
 block(group,1.7,.14,.36,u,bottom-.07,.04,stone);
 // Brick arch voussoirs and a small warehouse lamp under each pier.
 for(let a=0;a<Math.PI;a+=Math.PI/9){const o=block(group,.14,.25,.12,u+Math.cos(a+.17)*.91,spring+Math.sin(a+.17)*.91,.01,brick);o.rotation.z=a+.17-Math.PI/2;}

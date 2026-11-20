@@ -1,6 +1,7 @@
 import * as THREE from './three.module.js';
 import {COURT as C} from './court-geometry.js';
 export const COURT_SCHEMES={
+ '8':{name:'Court 8 · Veterans concrete bowl',description:'Philadelphia stadium-inspired concrete ribs, recessed concourses, yellow, orange and brown seating, green hardcourt and high light banks.',floor:'stadium',colors:{upper:'#adafa6',lower:'#56645d',roof:'#7a8179',wood:'#4c5b58',trim:'#cd8139',ink:'#eadbb2',tape:'#d5bc7b',cord:'#303b36',out:'#c37337'},sun:'#fff1d6'},
  '1':{name:'Court 1 · Parquet club',description:'The original worn parquet court, pale plaster and warm gallery lighting.',floor:'parquet',colors:{upper:'#d8d0ba',lower:'#9ca99c',roof:'#a19a83',wood:'#c6b08c',trim:'#a89c7e',ink:'#020302',tape:'#bfb99e',cord:'#252823',out:'#79483c'},sun:'#fff0d0'},
  '2':{name:'Court 2 · Timber hall',description:'Inspired by your first photo: scuffed terracotta, charcoal walls, ivory plaster and warm timber.',floor:'terracotta',colors:{upper:'#eee9d7',lower:'#797973',roof:'#77776a',wood:'#5e6040',trim:'#395740',ink:'#272d29',tape:'#315745',cord:'#344a39',out:'#995447'},sun:'#ffe1aa'},
  '5':{name:'Court 5 · Grey Expectations',description:'Grey hull walls and a red bootstripe, warm white topsides, teak decking, stainless portholes and a yacht-club gallery.',floor:'teak',colors:{upper:'#f0f0eb',lower:'#a4aaad',roof:'#c19c73',wood:'#d1ab80',trim:'#aebbc1',ink:'#242a2d',tape:'#f0eee4',cord:'#334448',out:'#bf3b35'},sun:'#edf5ff'},
@@ -12,7 +13,7 @@ export const COURT_SCHEMES={
 export function courtScheme(id){return COURT_SCHEMES[String(id)]??COURT_SCHEMES['1'];}
 export function readCourtScheme(storage){try{const id=storage.getItem('royal-court-scheme-v1');return COURT_SCHEMES[id]?id:'1';}catch{return '1';}}
 export function saveCourtScheme(storage,id){try{storage.setItem('royal-court-scheme-v1',COURT_SCHEMES[id]?id:'1');}catch{}}
-export function paintedFloorColor(id,x,z){return id==='7'?'#c75227':id==='6'?'#a26443':id==='5'?'#b28a61':id==='4'?'#6a7778':id==='3'&&z<C.serviceLineZ&&x<C.faultLineX?'#587a37':id==='3'?'#ac413b':'#b76e46';}
+export function paintedFloorColor(id,x,z){return id==='8'?'#557354':id==='7'?'#c75227':id==='6'?'#a26443':id==='5'?'#b28a61':id==='4'?'#6a7778':id==='3'&&z<C.serviceLineZ&&x<C.faultLineX?'#587a37':id==='3'?'#ac413b':'#b76e46';}
 export function paintedCourtTexture(id,anisotropy=1){const canvas=document.createElement('canvas');canvas.width=1024;canvas.height=2048;const ctx=canvas.getContext('2d');ctx.fillStyle=paintedFloorColor(id,0,0);ctx.fillRect(0,0,1024,2048);
  if(id==='5'){for(let x=0;x<1024;x+=22){ctx.fillStyle=['#b99368','#b08a62','#c09c73','#ae875e'][Math.floor(x/22)%4];ctx.fillRect(x,0,21,2048);ctx.fillStyle='#343b36';ctx.fillRect(x+21,0,1,2048);for(let n=0;n<6;n++){ctx.strokeStyle='rgba(65,40,20,.09)';ctx.lineWidth=.6;ctx.beginPath();ctx.moveTo(x+3+n*3,0);ctx.bezierCurveTo(x+6+n*2,650,x+1+n*3,1400,x+3+n*3,2048);ctx.stroke();}for(let y=(Math.floor(x/22)%3)*310;y<2048;y+=930){ctx.fillStyle='#66544380';ctx.fillRect(x,y,21,1);}}}
  // CanvasTexture's bottom row maps to the service end; green is the legal receiving box.
