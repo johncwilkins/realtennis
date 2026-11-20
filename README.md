@@ -337,8 +337,8 @@ Validation: all 32 checks pass, including legal services and the existing roof/v
 
 
 
-## Palestra, Sphere and Augusta courts
+## Palestra and Sphere courts
 
-Court 9 is a Palestra-inspired fieldhouse with maple flooring, arched steelwork, high windows and red/navy seating. Court 10 is a Sphere-inspired immersive venue with four animated screen shows (aurora, star tunnel, geometric waves and ocean), fading between scenes during play. Court 11 is an Augusta-inspired garden with clubhouse verandas, green shutters, azaleas, pines and yellow flags. Select them in Settings → Players & match → Court. These are themed interpretations; the real-tennis playing dimensions and scoring remain the same.
+Court 9 uses navy wainscoting, red wall bands, recessed arched glazing, honey maple flooring and steel roof trusses. Court 10 puts its animated artwork on solid walls that follow the full tambour profile, with the surrounding dome continuing the show above. Select either in Settings → Players & match → Court. Augusta has been removed; a saved Augusta selection falls back to Court 1.
 
-Balls entering the dedans or grille now stay on the opening’s lower sill through the point-ending pause. Racket heads have a longer, narrower, offset shape and a slightly more visible ready angle. Lower-intelligence opponents sometimes anticipate a flat-wall rebound at the tambour, then hesitate before correcting after the actual ricochet.
+Balls entering the dedans or grille stay on the opening’s lower sill through the point-ending pause. Racket heads have a longer, narrower offset shape. Lower-intelligence opponents sometimes anticipate a flat-wall rebound at the tambour, then hesitate before correcting after the actual ricochet.

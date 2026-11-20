@@ -1,0 +1,10 @@
+import * as THREE from './three.module.js';
+import {COURT as C,wallX} from './court-geometry.js';
+export const venueRear=C.halfLength+(C.halfLength-C.endRoofInner);
+// These are the same straight/angled/straight sections used by collisions.
+export const mainWallRuns=()=>[[-C.halfLength,C.tambourEnd],[C.tambourEnd,C.tambourStart],[C.tambourStart,venueRear]].map(([a,b])=>({a,b,xa:wallX(a),xb:wallX(b)}));
+export function wallFrame(run){const {a,b,xa,xb}=run,g=new THREE.Group();g.position.set((xa+xb)/2,0,(a+b)/2);g.rotation.y=Math.atan2(-(b-a),xb-xa);g.userData.mainWallRun={a,b};return g;}
+// Subdividing keeps large surfaces well behaved in the Canvas fallback renderer.
+export function wallSurface(group,corners,material,uvAt=null){const [a,b,c,d]=corners.map(p=>new THREE.Vector3(...p)),nx=Math.max(1,Math.ceil(a.distanceTo(b))),ny=Math.max(1,Math.ceil(a.distanceTo(d))),positions=[],uv=[];const at=(u,v)=>a.clone().lerp(b,u).lerp(d.clone().lerp(c,u),v);for(let y=0;y<ny;y++)for(let x=0;x<nx;x++){const points=[[x/nx,y/ny],[(x+1)/nx,y/ny],[(x+1)/nx,(y+1)/ny],[x/nx,y/ny],[(x+1)/nx,(y+1)/ny],[x/nx,(y+1)/ny]].map(([u,v])=>at(u,v));for(let i=0;i<6;i+=3){const triangle=points.slice(i,i+3),coords=triangle.map(p=>uvAt?uvAt(p):[p.z*.15,p.y*.25]);if(uvAt&&Math.max(...coords.map(p=>p[0]))-Math.min(...coords.map(p=>p[0]))>.5)for(const p of coords)if(p[0]<.5)p[0]+=1;triangle.forEach((p,j)=>{positions.push(...p.toArray());uv.push(...coords[j]);});}}
+ const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));geo.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));geo.computeVertexNormals();const mesh=new THREE.Mesh(geo,material);mesh.receiveShadow=true;group.add(mesh);return mesh;}
+export function mainWallSurface(group,run,low,high,material,uvAt=null){const mesh=wallSurface(group,[[run.xa-.012,low,run.a],[run.xb-.012,low,run.b],[run.xb-.012,high,run.b],[run.xa-.012,high,run.a]],material,uvAt);mesh.userData.profiledMainWall={a:run.a,b:run.b,low,high};return mesh;}
