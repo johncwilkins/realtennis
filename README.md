@@ -350,3 +350,5 @@ Courts 4 and 7 use translucent architectural glass; Court 7 omits the window cro
 Choose **Change session → Tournament** for an eight-player knockout bracket. Select seven opponents, play your quarterfinal, semifinal and final, and let ratings determine the other results. Completed results persist in local browser storage; a match in progress restarts after a reload. The Bracket button returns to your saved tournament.
 
 Each tournament assigns seven unique courts and saves the assignments with the bracket. Every fixture displays its court; launching a match loads that court and locks court selection for that tournament match.
+
+The tournament human player is selectable directly as Player 1. Each round’s computer results are simulated only after your match in that round; later rounds stay pending. After elimination, reveal remaining rounds one at a time. Older saved brackets remove prematurely simulated results while retaining played matches. Sphere smiley pupils track the live ball in court coordinates, including height and bounces.

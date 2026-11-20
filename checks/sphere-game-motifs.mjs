@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import {sphereBallGaze} from '../dist/sphere-gaze.js';
 import {Match} from '../dist/rules.js';
 import {SPHERE_SHOWS,SphereMotifs,paintSphereMotif} from '../dist/sphere-motifs.js';
 const themes=new SphereMotifs();themes.startSession();assert.equal(themes.index,0);themes.tick(3600);assert.equal(themes.index,0,'long rallies never switch the motif');for(const kind of ['point','chase','off'])assert.equal(themes.onResult({kind}),false);assert.equal(themes.index,0);
@@ -8,3 +9,7 @@ assert.equal(themes.index,5);assert.equal(themes.onResult({kind:'match'}),false,
 function trace(show,time){const calls=[],gradient={addColorStop(...a){calls.push(['gradient',...a]);}},context=new Proxy({createLinearGradient:()=>gradient,createRadialGradient:()=>gradient},{get:(o,k)=>k in o?o[k]:(...args)=>calls.push([k,...args]),set:(o,k,v)=>{calls.push([k,v]);o[k]=v;return true;}});paintSphereMotif(context,show,time);return JSON.stringify(calls);}
 for(let show=0;show<7;show++){assert.notEqual(trace(show,0),trace(show,3),SPHERE_SHOWS[show]+' moves');assert.ok(!trace(show,2).includes('null'),'all drawing coordinates are finite');}
 const code=fs.readFileSync(new URL('../dist/game.js',import.meta.url),'utf8');assert.ok(code.includes('function start(){court.startSessionMotif?.();'));assert.ok(code.includes('function finish(result,reason){court.gameFinished?.(result);'));console.log('Passed: seven moving motifs; eyes, stripes and all scenes animate; each tennis game/set advances once; points/chases/time never switch motifs; crossfade, session advance and wraparound.');
+
+const right=sphereBallGaze(768,584,{x:0,y:1,z:8}),left=sphereBallGaze(768,584,{x:0,y:1,z:-8}),high=sphereBallGaze(768,584,{x:0,y:15,z:1}),low=sphereBallGaze(768,584,{x:0,y:.1,z:1});
+assert.ok(right.x>0&&left.x<0,'pupils follow lateral ball motion');assert.ok(high.y<0&&low.y>0,'pupils follow rising and bouncing balls');assert.ok(sphereBallGaze(0,584,{x:0,y:1,z:8}).x<0,'opposite wall reverses tangent');assert.deepEqual(sphereBallGaze(310,584,null),{x:0,y:0});for(let x=0;x<=1536;x+=32)for(const y of [.1,5,20]){const gaze=sphereBallGaze(x,584,{x:2,y,z:4});assert.ok(Number.isFinite(gaze.x)&&Number.isFinite(gaze.y));assert.ok((gaze.x/11)**2+(gaze.y/14)**2<=1.000001,'pupils stay within their sockets');}
+const hall=fs.readFileSync(new URL('../dist/sphere-hall.js',import.meta.url),'utf8');assert.ok(hall.includes('sphereBallGaze(x,y,ball)'));assert.ok(code.includes('court.updateBalls(dt,ball)'));console.log('Passed: live ball gaze follows lateral motion, height, bounce direction and opposite-wall orientation with finite bounded pupil positions.');

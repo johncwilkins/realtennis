@@ -10,12 +10,12 @@ export class SphereMotifs {
 }
 function glow(ctx,x,y,r,color){const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,color+'b0');g.addColorStop(1,color+'00');ctx.fillStyle=g;ctx.fillRect(x-r,y-r,r*2,r*2);}
 function star(ctx,x,y,r,rotation,color){ctx.beginPath();for(let i=0;i<10;i++){const a=rotation+i*Math.PI/5,rr=i%2?r*.43:r;const X=x+Math.cos(a)*rr,Y=y+Math.sin(a)*rr;i?ctx.lineTo(X,Y):ctx.moveTo(X,Y);}ctx.closePath();ctx.fillStyle=color;ctx.fill();}
-export function paintSphereMotif(ctx,show,t,alpha=1){const w=1536,h=768;ctx.save();ctx.globalAlpha=alpha;ctx.fillStyle='#03080f';ctx.fillRect(0,0,w,h);const drift=t*.13;
+export function paintSphereMotif(ctx,show,t,alpha=1,gaze=null){const w=1536,h=768;ctx.save();ctx.globalAlpha=alpha;ctx.fillStyle='#03080f';ctx.fillRect(0,0,w,h);const drift=t*.13;
  if(show===0){for(let band=-3;band<12;band++){ctx.beginPath();for(let x=0;x<=w;x+=14){const y=band*105+Math.sin(x*.0035+drift+band*.32)*100+Math.cos(x*.008-drift*.6)*23;x?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.strokeStyle=['#236f79','#4b548d','#73619b','#3b8c88'][((band%4)+4)%4];ctx.lineWidth=39;ctx.stroke();}}
  if(show===1){
-  // Three large faces repeat around the walls; pupils glance independently of drift.
-  for(const base of [310,840,1370]){const x=base+Math.sin(t*.12+base)*45,y=584+Math.sin(t*.17+base)*15,r=105;glow(ctx,x,y,r*1.65,'#a58422');const gold=ctx.createRadialGradient(x-r*.3,y-r*.4,5,x,y,r);gold.addColorStop(0,'#ffe777');gold.addColorStop(1,'#eab823');ctx.fillStyle=gold;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#c48d13';ctx.lineWidth=3;ctx.stroke();const blink=Math.max(.10,Math.min(1,(Math.sin(t*.65)*.5+.5)*12));
-   for(const eye of [-1,1]){const ex=x+eye*34,ey=y-25;ctx.fillStyle='#fff7da';ctx.beginPath();ctx.ellipse(ex,ey,22,29*blink,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#17202c';ctx.beginPath();ctx.ellipse(ex+Math.sin(t*.8)*9,ey+Math.sin(t*.43)*8,9,13*blink,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#ffffff';ctx.beginPath();ctx.arc(ex+Math.sin(t*.8)*9-3,ey+Math.sin(t*.43)*8-4,2,0,Math.PI*2);ctx.fill();}
+  // Three large faces repeat around the walls; pupils track the live ball from each wall position.
+  for(const base of [310,840,1370]){const x=base+Math.sin(t*.12+base)*45,y=584+Math.sin(t*.17+base)*15,r=105;glow(ctx,x,y,r*1.65,'#a58422');const gold=ctx.createRadialGradient(x-r*.3,y-r*.4,5,x,y,r);gold.addColorStop(0,'#ffe777');gold.addColorStop(1,'#eab823');ctx.fillStyle=gold;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#c48d13';ctx.lineWidth=3;ctx.stroke();const look=gaze?.(x,y)??{x:0,y:0};const blink=Math.max(.10,Math.min(1,(Math.sin(t*.65)*.5+.5)*12));
+   for(const eye of [-1,1]){const ex=x+eye*34,ey=y-25;ctx.fillStyle='#fff7da';ctx.beginPath();ctx.ellipse(ex,ey,22,29*blink,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#17202c';ctx.beginPath();ctx.ellipse(ex+look.x,ey+look.y,9,13*blink,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#ffffff';ctx.beginPath();ctx.arc(ex+look.x-3,ey+look.y-4,2,0,Math.PI*2);ctx.fill();}
    ctx.strokeStyle='#44301b';ctx.lineWidth=7;ctx.lineCap='round';ctx.beginPath();ctx.arc(x,y+12,49,.10*Math.PI,.90*Math.PI);ctx.stroke();
   }
  }

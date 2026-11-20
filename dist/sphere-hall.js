@@ -1,3 +1,4 @@
+import {sphereBallGaze} from './sphere-gaze.js';
 import {SPHERE_SHOWS,SphereMotifs,paintSphereMotif} from './sphere-motifs.js';
 import * as THREE from './three.module.js';
 import {COURT as C,wallX} from './court-geometry.js';
@@ -22,7 +23,7 @@ export function buildSphereHall(){
  for(const side of [-1,1]){const g=new THREE.Group();g.userData.endSide=side;const rear=side>0?venueRear:-C.halfLength,xr=wallX(rear),z=rear-side*.014;panel(g,[[C.roofOuterX,3.4,z],[xr,3.4,z],[xr,SPHERE_WALL_HEIGHT,z],[C.roofOuterX,SPHERE_WALL_HEIGHT,z]],upperDisplay);
   ends.push(g);
  }
- function update(dt){if(!active)return;time+=Math.max(0,dt);motifs.tick(dt);if(!ctx||Math.floor(time*10)===last)return;last=Math.floor(time*10);const state=motifs.state();if(state.blend<1){paintSphereMotif(ctx,state.previous,time,1);paintSphereMotif(ctx,state.index,time,state.blend);}else paintSphereMotif(ctx,state.index,time,1);map.needsUpdate=true;}
+ function update(dt,ball){if(!active)return;time+=Math.max(0,dt);motifs.tick(dt);const fps=motifs.index===1||(motifs.previous===1&&motifs.elapsed<2)?30:10;if(!ctx||Math.floor(time*fps)===last)return;last=Math.floor(time*fps);const state=motifs.state(),gaze=(x,y)=>sphereBallGaze(x,y,ball);if(state.blend<1){paintSphereMotif(ctx,state.previous,time,1,gaze);paintSphereMotif(ctx,state.index,time,state.blend,gaze);}else paintSphereMotif(ctx,state.index,time,1,gaze);map.needsUpdate=true;}
  if(ctx){paintSphereMotif(ctx,0,0,1);map.needsUpdate=true;}
  return {sides,ends,screenMap:map,shows:SPHERE_SHOWS,motifs,startSession(){motifs.startSession();},gameFinished(result){return motifs.onResult(result);},setVisible(on,overview=false){active=on;sides.visible=on;walls.visible=!overview;for(const g of ends)g.visible=on&&!overview;},setEndView(){},update};
 }
