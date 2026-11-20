@@ -358,3 +358,9 @@ The tournament human player is selectable directly as Player 1. Each round’s c
 Court 12, Playground, adds chain-link fencing, brick apartment windows and fire escapes, graffiti concrete, scraped asphalt and chipped yellow lines. It follows the existing tambour and uses normal end-wall visibility. Playground is selectable and eligible for tournament assignments; retired Court 11 remains unused.
 
 Every real racket contact (human, computer, practice feed and service) triggers a brief Sphere reaction: smiley blink, bouncing dots, pulsing stripes, flaring stars, gathering fireflies, ocean ripples and a brighter aurora. Eyes continue tracking the live ball. Wall and floor impacts do not trigger these effects.
+
+Playground apartments overlap at every corner, continue below court level and extend beyond both camera ends. Matching asphalt beneath the cutaway closes the lower background while retaining the chain link, graffiti and existing fire escapes.
+
+The Playground apartment facade is straight behind the tambour; only its chain-link fence follows the playing-wall angle. A Gray Expectation graffiti tag joins the wall artwork.
+
+Playground graffiti also includes Lafayette Crew in maroon and cream.
