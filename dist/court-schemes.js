@@ -1,6 +1,7 @@
 import * as THREE from './three.module.js';
 import {COURT as C} from './court-geometry.js';
 export const COURT_SCHEMES={
+ '12':{name:'Court 12 · Playground',description:'Chain-link fencing, brick apartments and fire escapes above graffiti-covered concrete walls. Weathered asphalt, faded painted patches, scrapes and chipped yellow court lines.',floor:'asphalt',colors:{upper:'#c68f6b',lower:'#d4d0c2',roof:'#565f59',wood:'#65756b',trim:'#a9ae90',ink:'#e8c458',tape:'#cfbf83',cord:'#262d2b',out:'#d8b44f'},sun:'#ffe6bb'},
  '9':{name:'Court 9 · Palestra',description:'A Philadelphia fieldhouse: arched steel trusses, recessed glazed windows, navy wainscoting, red bands and honey maple. Inspired by the Palestra.',floor:'maple',colors:{upper:'#c29a7b',lower:'#253e52',roof:'#946d43',wood:'#c29461',trim:'#ac343e',ink:'#f3ebd9',tape:'#e4d6b4',cord:'#272c33',out:'#bb4248'},sun:'#fff0d7'},
  '10':{name:'Court 10 · Sphere',description:'Tall animated walls follow the tambour and fill the view with black-and-color stripes, a roaming smiley, floating polka dots, stars, a moonlit forest, ocean currents and an aurora. A new moving motif begins each game. The real-tennis court stays fully playable.',floor:'midnight',colors:{upper:'#122432',lower:'#7d8d9d',roof:'#1e3349',wood:'#356079',trim:'#60cbd7',ink:'#e5f4ec',tape:'#e3d5ab',cord:'#1d2635',out:'#5bd9e5'},sun:'#d9eeff'},
  '8':{name:'Court 8 · Veterans concrete bowl',description:'Philadelphia stadium-inspired weathered concrete, deep concourses, metal railings, muted section signs, green hardcourt and warm lighting.',floor:'stadium',colors:{upper:'#adafa6',lower:'#56645d',roof:'#7a8179',wood:'#4c5b58',trim:'#cd8139',ink:'#eadbb2',tape:'#d5bc7b',cord:'#303b36',out:'#c37337'},sun:'#fff1d6'},
@@ -15,7 +16,7 @@ export const COURT_SCHEMES={
 export function courtScheme(id){return COURT_SCHEMES[String(id)]??COURT_SCHEMES['1'];}
 export function readCourtScheme(storage){try{const id=storage.getItem('royal-court-scheme-v1');return COURT_SCHEMES[id]?id:'1';}catch{return '1';}}
 export function saveCourtScheme(storage,id){try{storage.setItem('royal-court-scheme-v1',COURT_SCHEMES[id]?id:'1');}catch{}}
-export function paintedFloorColor(id,x,z){return id==='10'?'#1b3549':id==='9'?'#c7975a':id==='8'?'#557354':id==='7'?'#c75227':id==='6'?'#a26443':id==='5'?'#b28a61':id==='4'?'#6a7778':id==='3'&&z<C.serviceLineZ&&x<C.faultLineX?'#587a37':id==='3'?'#ac413b':'#b76e46';}
+export function paintedFloorColor(id,x,z){return id==='12'?'#424946':id==='10'?'#1b3549':id==='9'?'#c7975a':id==='8'?'#557354':id==='7'?'#c75227':id==='6'?'#a26443':id==='5'?'#b28a61':id==='4'?'#6a7778':id==='3'&&z<C.serviceLineZ&&x<C.faultLineX?'#587a37':id==='3'?'#ac413b':'#b76e46';}
 export function paintedCourtTexture(id,anisotropy=1){const canvas=document.createElement('canvas');canvas.width=1024;canvas.height=2048;const ctx=canvas.getContext('2d');ctx.fillStyle=paintedFloorColor(id,0,0);ctx.fillRect(0,0,1024,2048);
  if(id==='9'){for(let y=0;y<2048;y+=24){for(let x=0;x<1024;x+=210){ctx.fillStyle=['#d4af73','#c99d60','#d9b780','#cfa76b'][(Math.floor(y/24)+Math.floor(x/210))%4];ctx.fillRect(x+(y/24%3)*67-130,y,209,23);}ctx.fillStyle='#7c5c332e';ctx.fillRect(0,y,1024,1);}}
  if(id==='5'){for(let x=0;x<1024;x+=22){ctx.fillStyle=['#b99368','#b08a62','#c09c73','#ae875e'][Math.floor(x/22)%4];ctx.fillRect(x,0,21,2048);ctx.fillStyle='#343b36';ctx.fillRect(x+21,0,1,2048);for(let n=0;n<6;n++){ctx.strokeStyle='rgba(65,40,20,.09)';ctx.lineWidth=.6;ctx.beginPath();ctx.moveTo(x+3+n*3,0);ctx.bezierCurveTo(x+6+n*2,650,x+1+n*3,1400,x+3+n*3,2048);ctx.stroke();}for(let y=(Math.floor(x/22)%3)*310;y<2048;y+=930){ctx.fillStyle='#66544380';ctx.fillRect(x,y,21,1);}}}
@@ -23,6 +24,12 @@ export function paintedCourtTexture(id,anisotropy=1){const canvas=document.creat
  // CanvasTexture's bottom row maps to the service end; green is the legal receiving box.
  if(id==='3'){ctx.fillStyle=paintedFloorColor(id,-1,-12);const edge=(C.halfLength-C.serviceLineZ)/(2*C.halfLength)*2048;ctx.fillRect(0,edge,(C.faultLineX+5)/10*1024,2048-edge);}
  let seed=4281;const rnd=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};
+ if(id==='12'){
+  ctx.fillStyle='#52615b';ctx.fillRect(12,8,1000,2032);ctx.fillStyle='#596354';ctx.fillRect(35,90,954,830);ctx.fillStyle='#45544e';ctx.fillRect(50,1050,924,910);
+  for(let i=0;i<170;i++){ctx.fillStyle=i%3?'#343d38':'#7c8271';ctx.fillRect(rnd()*1024,rnd()*2048,6+rnd()*70,1+rnd()*6);}
+  for(let i=0;i<32;i++){let x=rnd()*1024,y=rnd()*2048;ctx.strokeStyle='#242e2a99';ctx.lineWidth=1+rnd()*2;ctx.beginPath();ctx.moveTo(x,y);for(let j=0;j<7;j++){x+=(rnd()-.5)*45;y+=10+rnd()*24;ctx.lineTo(x,y);}ctx.stroke();}
+  for(let i=0;i<1600;i++){ctx.strokeStyle=i%4?'#1f292853':'#a2a8933a';ctx.lineWidth=.8+rnd()*3;const x=rnd()*1024,y=rnd()*2048;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+5+rnd()*45,y-5+rnd()*12);ctx.stroke();}
+ }
  for(let n=0;n<42000;n++){ctx.fillStyle=rnd()>.5?'rgba(255,244,218,.028)':'rgba(28,20,14,.028)';ctx.fillRect(rnd()*1024,rnd()*2048,1+rnd()*5,.5+rnd()*2);}
  for(let n=0;n<650;n++){const x=rnd()*1024,y=rnd()*2048;ctx.strokeStyle=n%3?'rgba(25,25,22,.14)':'rgba(237,216,181,.12)';ctx.lineWidth=.4+rnd()*1.8;ctx.beginPath();ctx.ellipse(x,y,3+rnd()*15,1+rnd()*4,rnd()*Math.PI,0,Math.PI*(.5+rnd()));ctx.stroke();}
  for(let n=0;n<70;n++){const x=rnd()*1024,y=rnd()*2048;const g=ctx.createRadialGradient(x,y,0,x,y,25+rnd()*65);g.addColorStop(0,'rgba(35,25,20,.045)');g.addColorStop(1,'rgba(35,25,20,0)');ctx.fillStyle=g;ctx.fillRect(x-100,y-100,200,200);}

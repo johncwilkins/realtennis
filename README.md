@@ -352,3 +352,9 @@ Choose **Change session → Tournament** for an eight-player knockout bracket. S
 Each tournament assigns seven unique courts and saves the assignments with the bracket. Every fixture displays its court; launching a match loads that court and locks court selection for that tournament match.
 
 The tournament human player is selectable directly as Player 1. Each round’s computer results are simulated only after your match in that round; later rounds stay pending. After elimination, reveal remaining rounds one at a time. Older saved brackets remove prematurely simulated results while retaining played matches. Sphere smiley pupils track the live ball in court coordinates, including height and bounces.
+
+### Playground and reactive Sphere walls
+
+Court 12, Playground, adds chain-link fencing, brick apartment windows and fire escapes, graffiti concrete, scraped asphalt and chipped yellow lines. It follows the existing tambour and uses normal end-wall visibility. Playground is selectable and eligible for tournament assignments; retired Court 11 remains unused.
+
+Every real racket contact (human, computer, practice feed and service) triggers a brief Sphere reaction: smiley blink, bouncing dots, pulsing stripes, flaring stars, gathering fireflies, ocean ripples and a brighter aurora. Eyes continue tracking the live ball. Wall and floor impacts do not trigger these effects.

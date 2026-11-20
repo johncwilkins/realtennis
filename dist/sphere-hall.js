@@ -1,5 +1,5 @@
 import {sphereBallGaze} from './sphere-gaze.js';
-import {SPHERE_SHOWS,SphereMotifs,paintSphereMotif} from './sphere-motifs.js';
+import {SPHERE_SHOWS,SphereMotifs,SphereContactEffects,paintSphereMotif} from './sphere-motifs.js';
 import * as THREE from './three.module.js';
 import {COURT as C,wallX} from './court-geometry.js';
 import {mainWallRuns,mainWallSurface,wallSurface,venueRear} from './venue-walls.js';
@@ -9,7 +9,7 @@ export function sphereWallUV(p){const x=p.x+1.08,z=p.z-1;const u=.5+Math.atan2(z
 export function setSphereWallUV(mesh,active){const g=mesh.geometry,uv=g?.attributes.uv;if(!uv)return;if(!savedUV.has(g))savedUV.set(g,uv.array.slice());if(!active){uv.array.set(savedUV.get(g));uv.needsUpdate=true;return;}mesh.updateWorldMatrix(true,false);const p=g.attributes.position,v=new THREE.Vector3();for(let i=0;i<p.count;i++){v.fromBufferAttribute(p,i).applyMatrix4(mesh.matrixWorld);const [u,w]=sphereWallUV(v);uv.setXY(i,u,w);}uv.needsUpdate=true;}
 export {SPHERE_SHOWS,sphereShow} from './sphere-motifs.js';
 export function buildSphereHall(){
- const sides=new THREE.Group(),ends=[],walls=new THREE.Group();sides.add(walls);sides.userData.sphereHall=true;let time=0,last=-1,active=false;const motifs=new SphereMotifs();
+ const sides=new THREE.Group(),ends=[],walls=new THREE.Group();sides.add(walls);sides.userData.sphereHall=true;let time=0,last=-1,active=false;const motifs=new SphereMotifs(),effects=new SphereContactEffects();
  const canvas=typeof document!=='undefined'?document.createElement('canvas'):null;if(canvas){canvas.width=1536;canvas.height=768;}const ctx=canvas?.getContext('2d'),map=canvas?new THREE.CanvasTexture(canvas):null;if(map){map.colorSpace=THREE.SRGBColorSpace;map.userData.animated=true;map.wrapS=THREE.RepeatWrapping;}
  // Tall planar display walls fill the view; there is no background dome.
  const upperDisplay=new THREE.MeshBasicMaterial({color:'#c4d4dc',map,side:THREE.DoubleSide,fog:false}),lowerDisplay=new THREE.MeshBasicMaterial({color:'#647d91',map,side:THREE.DoubleSide,fog:false});
@@ -23,7 +23,7 @@ export function buildSphereHall(){
  for(const side of [-1,1]){const g=new THREE.Group();g.userData.endSide=side;const rear=side>0?venueRear:-C.halfLength,xr=wallX(rear),z=rear-side*.014;panel(g,[[C.roofOuterX,3.4,z],[xr,3.4,z],[xr,SPHERE_WALL_HEIGHT,z],[C.roofOuterX,SPHERE_WALL_HEIGHT,z]],upperDisplay);
   ends.push(g);
  }
- function update(dt,ball){if(!active)return;time+=Math.max(0,dt);motifs.tick(dt);const fps=motifs.index===1||(motifs.previous===1&&motifs.elapsed<2)?30:10;if(!ctx||Math.floor(time*fps)===last)return;last=Math.floor(time*fps);const state=motifs.state(),gaze=(x,y)=>sphereBallGaze(x,y,ball);if(state.blend<1){paintSphereMotif(ctx,state.previous,time,1,gaze);paintSphereMotif(ctx,state.index,time,state.blend,gaze);}else paintSphereMotif(ctx,state.index,time,1,gaze);map.needsUpdate=true;}
+ function update(dt,ball){if(!active)return;time+=Math.max(0,dt);motifs.tick(dt);effects.tick(dt);const fps=(effects.age<.6||motifs.index===1)||(motifs.previous===1&&motifs.elapsed<2)?30:10;if(!ctx||Math.floor(time*fps)===last)return;last=Math.floor(time*fps);const state=motifs.state(),gaze=(x,y)=>sphereBallGaze(x,y,ball),reaction=effects.state();if(ball){const uv=sphereWallUV(ball);reaction.target={x:uv[0]*1536,y:(1-uv[1])*768};}if(state.blend<1){paintSphereMotif(ctx,state.previous,time,1,gaze,reaction);paintSphereMotif(ctx,state.index,time,state.blend,gaze,reaction);}else paintSphereMotif(ctx,state.index,time,1,gaze,reaction);map.needsUpdate=true;}
  if(ctx){paintSphereMotif(ctx,0,0,1);map.needsUpdate=true;}
- return {sides,ends,screenMap:map,shows:SPHERE_SHOWS,motifs,startSession(){motifs.startSession();},gameFinished(result){return motifs.onResult(result);},setVisible(on,overview=false){active=on;sides.visible=on;walls.visible=!overview;for(const g of ends)g.visible=on&&!overview;},setEndView(){},update};
+ return {sides,ends,screenMap:map,shows:SPHERE_SHOWS,motifs,effects,racketContact(){effects.hit();last=-1;},startSession(){motifs.startSession();},gameFinished(result){return motifs.onResult(result);},setVisible(on,overview=false){active=on;sides.visible=on;walls.visible=!overview;for(const g of ends)g.visible=on&&!overview;},setEndView(){},update};
 }
