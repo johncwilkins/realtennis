@@ -339,6 +339,14 @@ Validation: all 32 checks pass, including legal services and the existing roof/v
 
 ## Palestra and Sphere courts
 
-Court 9 uses navy wainscoting, red wall bands, recessed arched glazing, honey maple flooring and steel roof trusses. Court 10 puts its animated artwork on solid walls that follow the full tambour profile, with tall walls filling the view and no background dome. Its four animated shows feature nebula currents, a hyperspace lattice, liquid-prism waves and bioluminescent depths. Select either in Settings → Players & match → Court. Augusta has been removed; a saved Augusta selection falls back to Court 1.
+Court 9 uses navy wainscoting, red wall bands, recessed arched glazing, honey maple flooring and steel roof trusses. Court 10 puts its animated artwork on solid walls that follow the full tambour profile, with tall walls filling the view and no background dome. Seven moving motifs change once per tennis game: black-and-color stripes, a yellow smiley with roaming eyes, polka dots, stars, a moonlit forest, ocean currents and northern lights. Motifs crossfade between games and remain animated throughout rallies. Starting another practice session also advances the motif. Select either in Settings → Players & match → Court. Augusta has been removed; a saved Augusta selection falls back to Court 1.
 
 Balls entering the dedans or grille stay on the opening’s lower sill through the point-ending pause. Racket heads have a longer, narrower offset shape. Lower-intelligence opponents sometimes anticipate a flat-wall rebound at the tambour, then hesitate before correcting after the actual ricochet.
+
+### Club updates and tournament mode
+
+Courts 4 and 7 use translucent architectural glass; Court 7 omits the window crossing the tambour. Court 5 has no end-wall sign. Courts 1 and 2 have translucent wooden roof trusses. The header links to an About page.
+
+Choose **Change session → Tournament** for an eight-player knockout bracket. Select seven opponents, play your quarterfinal, semifinal and final, and let ratings determine the other results. Completed results persist in local browser storage; a match in progress restarts after a reload. The Bracket button returns to your saved tournament.
+
+Each tournament assigns seven unique courts and saves the assignments with the bracket. Every fixture displays its court; launching a match loads that court and locks court selection for that tournament match.
