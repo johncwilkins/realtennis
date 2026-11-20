@@ -364,3 +364,5 @@ Playground apartments overlap at every corner, continue below court level and ex
 The Playground apartment facade is straight behind the tambour; only its chain-link fence follows the playing-wall angle. A Gray Expectation graffiti tag joins the wall artwork.
 
 Playground graffiti also includes Lafayette Crew in maroon and cream.
+
+Playground apartments now use four weathered masonry variants with brick relief, soot and repaired mortar. Individual windows have layered frames, projecting sills, partly transparent glass, varied curtains, dim interiors and occasional older air conditioners. Building bays vary in tone, floor spacing and window size; static details are batched for rendering.
