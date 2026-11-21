@@ -27,3 +27,5 @@ export function setupMouseUI({storage,settings,onCalibrated,inverted}){
 }
 
 Apartment graffiti now uses transparent ink overlays directly on brick, scattered across several levels instead of a gray-backed strip.
+
+Graffiti lettering is hand-traced with irregular letter strokes, paint drips and overspray. Apartment tags use the facade’s exact UV grid and clear the full window/frame/sill rectangles, keeping all paint on the masonry.
