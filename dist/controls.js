@@ -7,10 +7,10 @@ export function movePlayer(state,target,dt,{maxSpeed=6.2,acceleration=14,braking
 }
 export class WheelStroke{
  constructor(){this.reset();}
- reset(){this.energyCharged=false;this.position=0;this.pose=0;this.draw=0;this.armed=false;this.forward=false;this.contactStarted=false;this.pendingContact=false;this.contactUntil=0;this.activeUntil=0;this.lastEvent=-1000;this.lastForward=-1000;this.power=0;this.rawRate=0;this.hit=false;}
- input(delta,time,rateScale=1){const units=Math.abs(delta);if(units<.01)return;const gap=clamp(time-this.lastEvent,20,250);this.lastEvent=time;
- if(delta>0){this.energyCharged=false;this.draw=clamp(Math.max(this.draw,-this.position)+units/300,0,1);this.position=-this.draw;this.armed=this.draw>=.08;this.forward=false;this.pendingContact=false;this.contactStarted=false;this.contactUntil=0;this.activeUntil=0;this.hit=false;return;}
- if(!this.armed)return;const rate=units/(gap/1000),rawRate=rate/Math.max(.01,rateScale),p=clamp((rate-180)/3000,.08,1);this.rawRate=time-this.lastForward>220?rawRate:this.rawRate*.25+rawRate*.75;this.power=time-this.lastForward>220?p:this.power*.25+p*.75;this.lastForward=time;this.position=clamp(this.position+units/200,-1,1.1);this.forward=true;if(this.position>=0&&!this.contactStarted)this.pendingContact=true;
+ reset(){this.energyCharged=false;this.position=0;this.pose=0;this.draw=0;this.armed=false;this.forward=false;this.contactStarted=false;this.pendingContact=false;this.contactUntil=0;this.activeUntil=0;this.lastEvent=-1000;this.lastForward=-1000;this.power=0;this.rawRate=0;this.rateSamples=[];this.hit=false;}
+ input(delta,time,rateScale=1){const units=Math.abs(delta);if(units<.01)return;const gap=clamp(time-this.lastEvent,1,250);this.lastEvent=time;
+ if(delta>0){this.rateSamples=[];this.energyCharged=false;this.draw=clamp(Math.max(this.draw,-this.position)+units/300,0,1);this.position=-this.draw;this.armed=this.draw>=.08;this.forward=false;this.pendingContact=false;this.contactStarted=false;this.contactUntil=0;this.activeUntil=0;this.hit=false;return;}
+ if(!this.armed)return;this.rateSamples.push({time,units,gap});this.rateSamples=this.rateSamples.filter(s=>time-s.time<160);const rate=this.rateSamples.reduce((n,s)=>n+s.units,0)/(this.rateSamples.reduce((n,s)=>n+s.gap,0)/1000),rawRate=rate/Math.max(.01,rateScale),p=clamp((rate-180)/3000,.08,1);this.rawRate=time-this.lastForward>220?rawRate:this.rawRate*.25+rawRate*.75;this.power=time-this.lastForward>220?p:this.power*.25+p*.75;this.lastForward=time;this.position=clamp(this.position+units/200,-1,1.1);this.forward=true;if(this.position>=0&&!this.contactStarted)this.pendingContact=true;
  }
  tick(time,dt){if(time<this.contactUntil){this.pose=0;return;}
  const desired=this.position,step=(this.forward?7+12*this.power:8)*dt,next=this.pose+clamp(desired-this.pose,-step,step);
@@ -43,3 +43,4 @@ export class ShotChoice{
 }
 
 export function canCollectBall(practice,mode,server,position){return !practice&&mode==='ready'&&server===0&&position.z>COURT.halfLength-1.4&&Math.abs(position.x-COURT.dedans.x)<COURT.dedans.w/2;}
+
