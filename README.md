@@ -33,3 +33,5 @@ Graffiti lettering is hand-traced with irregular letter strokes, paint drips and
 Laptop-sized landscape windows now default to a 116% court view. Settings → Controls & view offers Auto, Standard, Larger and Largest court sizes plus a fullscreen button. Zoom shifts the aim toward the near court so both ends stay visible; overview retains its full-court framing. Display preference saves per browser.
 
 Playground graffiti now uses irregular scrawls, heavily varied letter shapes, faded layers and cross-outs. Apartment art is unique across each full frontage instead of tiled rows of repeated slogans, with window exclusions calculated in world coordinates.
+
+Playground wall and apartment graffiti density increased substantially, with more overlapping scrawls, cross-outs and faded marks while preserving clear windows.
