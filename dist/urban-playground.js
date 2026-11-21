@@ -1,3 +1,4 @@
+import {buildBasketballLot} from './playground-basketball.js';
 import * as THREE from './three.module.js';
 import {COURT as C,wallX} from './court-geometry.js';
 import {block,beam,finish} from './venue-tools.js';
@@ -39,9 +40,9 @@ export function buildUrbanPlayground(){
  }
  // The fence follows the playable tambour; apartments form a straight courtyard wall.
  for(const run of mainWallRuns()){const frame=wallFrame(run),span=Math.hypot(run.xb-run.xa,run.b-run.a);frame.userData.urbanTambourRun={a:run.a,b:run.b};frame.add(fence(span));block(frame,span,.18,.32,0,3.4,0,coping);upper.add(frame);}
- const right=frontage(venueRear+C.halfLength,14,PLAYGROUND_BACKDROP.extent-C.halfLength,PLAYGROUND_BACKDROP.extent-venueRear,false);right.position.set(5,0,(venueRear-C.halfLength)/2);right.rotation.y=-Math.PI/2;right.userData.straightApartments=true;upper.add(right);
+ const basketball=buildBasketballLot();upper.add(basketball);
  const left=frontage(venueRear+C.halfLength,12,PLAYGROUND_BACKDROP.extent-C.halfLength,PLAYGROUND_BACKDROP.extent-venueRear);left.position.set(C.roofOuterX,0,(venueRear-C.halfLength)/2);left.rotation.y=Math.PI/2;upper.add(left);
- for(const side of [-1,1]){const g=new THREE.Group(),z=side>0?venueRear:-C.halfLength,span=5-C.roofOuterX;g.userData.endSide=side;const face=frontage(span,side>0?15:13,0,0,false);face.position.set((5+C.roofOuterX)/2,0,z);face.rotation.y=side>0?Math.PI:0;g.add(face);const fenceSpan=wallX(z)-C.roofOuterX,edge=new THREE.Group();edge.add(fence(fenceSpan));block(edge,fenceSpan,.18,.32,0,3.4,0,coping);edge.position.set((wallX(z)+C.roofOuterX)/2,0,z);edge.rotation.y=side>0?Math.PI:0;g.add(edge);ends.push(g);}
+ for(const side of [-1,1]){const g=new THREE.Group(),z=side>0?venueRear:-C.halfLength,span=5-C.roofOuterX;g.userData.endSide=side;const face=frontage(span,side>0?15:13,side>0?72:0,side<0?72:0,false);face.position.set((5+C.roofOuterX)/2,0,z);face.rotation.y=side>0?Math.PI:0;face.userData.extendedBackApartment=true;g.add(face);const fenceSpan=wallX(z)-C.roofOuterX,edge=new THREE.Group();edge.add(fence(fenceSpan));block(edge,fenceSpan,.18,.32,0,3.4,0,coping);edge.position.set((wallX(z)+C.roofOuterX)/2,0,z);edge.rotation.y=side>0?Math.PI:0;g.add(edge);ends.push(g);}
 
  // Asphalt continues beneath the cutaway court instead of exposing background sky.
  const ground=new THREE.Mesh(new THREE.PlaneGeometry(180,180),finish('#3e4841'));ground.rotation.x=-Math.PI/2;ground.position.y=-.35;ground.userData.playgroundGround=true;upper.add(ground);
