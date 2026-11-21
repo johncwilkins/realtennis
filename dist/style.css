@@ -43,3 +43,5 @@ nav .game-link{font-size:13px;text-decoration:none;color:inherit;border:1px soli
 .bracket-court{font-size:12px!important;color:#b9c9be!important;margin:0 0 7px!important;line-height:1.4!important}#courtSelect:disabled{opacity:.7}
 
 .mouse-setup{grid-column:1/-1;padding:12px;border:1px solid #b8ae8555;border-radius:6px}.mouse-setup>button{width:100%}.mouse-setup p{margin:8px 0!important;font-size:13px!important}.mouse-setup small,.control-settings label small{display:block;font-size:11px;color:#b9c4b5;line-height:1.5}.control-settings output{float:right;color:#dfbd79}#mouseSetupPad{padding:18px;background:#274942;border:2px dashed #d5bd7e;overscroll-behavior:contain;text-align:center}#mouseSetupPad[hidden]{display:none}
+
+.fullscreen-choice{display:flex;flex-direction:column;justify-content:center;gap:5px}.fullscreen-choice small{font-size:11px;color:#bdc5b4}@media(min-width:901px) and (max-height:900px){#manualPanel small{font-size:11px}#rallyHud{font-size:10px}footer .hint{font-size:12px}}

@@ -29,3 +29,5 @@ export function setupMouseUI({storage,settings,onCalibrated,inverted}){
 Apartment graffiti now uses transparent ink overlays directly on brick, scattered across several levels instead of a gray-backed strip.
 
 Graffiti lettering is hand-traced with irregular letter strokes, paint drips and overspray. Apartment tags use the facade’s exact UV grid and clear the full window/frame/sill rectangles, keeping all paint on the masonry.
+
+Laptop-sized landscape windows now default to a 116% court view. Settings → Controls & view offers Auto, Standard, Larger and Largest court sizes plus a fullscreen button. Zoom shifts the aim toward the near court so both ends stay visible; overview retains its full-court framing. Display preference saves per browser.
