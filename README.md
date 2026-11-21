@@ -372,3 +372,7 @@ Playground apartments sit 3.2 m behind the fence line, with joined corners and r
 The projecting and painted Playground AC units have been removed. Windowless brick bays close each apartment corner and end between complete window columns; the straight end apartment walls join the full courtyard width while the fencing retains its playing-wall profile.
 
 The right-side Playground apartments are replaced by a faded basketball court with two rusty hoops, scattered broken glass and five weathered parked cars. The back apartment facades extend across the right side of the view; the left apartments, fire escapes, graffiti and playable tennis court remain.
+
+Apartment bases cover the below-ground window repeats, leaving complete first-floor windows above a graffiti-covered brick plinth. Basketball markings use US 94 × 50 ft proportions, correctly placed rectangular lanes, free-throw semicircles, basket-centered three-point arcs and straight corner lines, with hoops aligned to the markings. Additional weathered tags include No Dress Code, Nice Whites, Public Court and No Dues.
+
+Basketball layout reference: https://official.nba.com/rule-no-1-court-dimensions-equipment/
