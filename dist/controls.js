@@ -18,12 +18,12 @@ export class WheelStroke{
  if(time-this.lastForward>650&&this.position>=0){this.armed=false;this.forward=false;this.draw=0;this.position=0;}
  if(this.hit)this.activeUntil=0;
  }
- canHit(time){return this.armed&&!this.hit&&this.contactStarted&&time<=this.activeUntil&&this.pose>=-.01&&this.pose<=.65;}
+ canHit(time,accuracy=50){const help=clamp((accuracy-50)/50,0,1);return this.armed&&!this.hit&&this.contactStarted&&time<=this.activeUntil+60*help&&this.pose>=-.01&&this.pose<=.65+.18*help;}
  consume(time=this.lastForward){this.hit=true;this.activeUntil=0;this.pose=0;this.contactUntil=time+95;}
 }
-export function contactShot(ball,player,side,power,preferredHand=0,kind='regular'){
+export function contactShot(ball,player,side,power,preferredHand=0,kind='regular',accuracy=50){
  // Forward and right are relative to the player's end, so direction remains correct after changing ends.
- const ahead=(ball.z-player.z)*-side,right=(ball.x-player.x)*side,hand=Math.abs(right)<.2&&preferredHand?preferredHand:right<0?-1:1;const timingError=Math.sign(ahead)*Math.max(0,Math.abs(ahead)-.45);const steer=-hand*clamp(timingError/1.15,-1,1),angle=steer*(side*steer>0?.62:.42);const speed=10+12*clamp(power,0,1)**.85;
+ const ahead=(ball.z-player.z)*-side,right=(ball.x-player.x)*side,hand=Math.abs(right)<.2&&preferredHand?preferredHand:right<0?-1:1;const timingError=Math.sign(ahead)*Math.max(0,Math.abs(ahead)-(.45+.18*clamp((accuracy-50)/50,0,1)));const steer=-hand*clamp(timingError/1.15,-1,1),angle=steer*(side*steer>0?.62:.42);const speed=10+12*clamp(power,0,1)**.85;
  // Launch from the racket face, without a net-height solver or clearance correction.
  const loft=kind==='lob',depthLift=clamp((Math.abs(ball.z)-6)*.60,0,6),lowLift=clamp((.85-ball.y)*4,-2.5,3);
  const drive=kind==='drive',p=clamp(power,0,1);let elevation=clamp((drive?10:11.5)+depthLift+lowLift+clamp(ahead,-1.6,1.6)*1.2,drive?6:8,22);
@@ -31,7 +31,7 @@ export function contactShot(ball,player,side,power,preferredHand=0,kind='regular
  const vy=loft?7.2+2.2*p+clamp(ahead,-1.6,1.6)*.12:horizontal*Math.tan(elevation*Math.PI/180);if(loft)elevation=Math.atan2(vy,horizontal)*180/Math.PI;
  return {vx:side*Math.sin(angle)*horizontal,vy,vz:-side*Math.cos(angle)*horizontal,ahead,angle,speed:Math.hypot(horizontal,vy),hand,cut:loft?.1:.55,kind:loft?'lob':drive?'drive':'regular',elevation};
 }
-export function canContact(ball,player,side){const right=(ball.x-player.x)*side,ahead=(ball.z-player.z)*-side;return Math.abs(right)<=1.8&&Math.abs(ahead)<=1.6&&ball.y>=.12&&ball.y<=2.2;}
+export function canContact(ball,player,side,accuracy=50){const help=clamp((accuracy-50)/50,0,1),right=(ball.x-player.x)*side,ahead=(ball.z-player.z)*-side;return Math.abs(right)<=1.8+.12*help&&Math.abs(ahead)<=1.6+.12*help&&ball.y>=.12&&ball.y<=2.2;}
 export function racketSide(ball,player,side,previous=1){let x=ball.x;const distance=Math.abs(ball.z-player.z);if(distance>3&&Math.abs(ball.vz)>.1){const time=(player.z-ball.z)/ball.vz;if(time>0&&time<2){x=ball.x+ball.vx*time;const lo=-4.6,span=9;let folded=((x-lo)%(span*2)+span*2)%(span*2);x=lo+(folded>span?span*2-folded:folded);}}const right=(x-player.x)*side;return right>.12?1:right<-.12?-1:previous;}
 
 // Selection is independent of wheel input and is consumed only on a successful strike.

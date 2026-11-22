@@ -23,5 +23,5 @@ const strong=sample(100,6),medium=sample(50,6),weak=sample(1,6),long=sample(50,2
 assert.ok(strong>.015&&strong<.035);assert.ok(medium>.06&&medium<.09);assert.ok(weak>.15&&weak<.18);assert.ok(long>medium+.012);assert.ok(medium>human*1.6);assert.equal(sample(1,1),0,'opening exchange retains a grace period');assert.ok(sample(50,6,true,1)>medium);
 for(const court of Object.values(COURT_SCHEMES))assert.ok(!/^Court \d/.test(court.name));
 const html=fs.readFileSync(new URL('../dist/index.html',import.meta.url),'utf8');assert.ok(!/Court \d+ ·/.test(html));
-assert.ok(fs.readFileSync(new URL('../dist/character-play.js',import.meta.url),'utf8').includes('{opponent:true}'));
+assert.ok(fs.readFileSync(new URL('../dist/character-play.js',import.meta.url),'utf8').includes('{opponent:true,pressure}'));
 console.log('Passed: movement during both CPU service phases; saved cursor applied on own release; skill-scaled CPU net errors and long-rally pressure; names-only courts.',{strong,medium,weak,long,human});
