@@ -13,6 +13,7 @@ export function chaseAdvice(c,match,side){if(c.ratings.intelligence<50||!match.p
 // A fast ball crowding the torso forces a cramped block rather than a clean swing.
 // Use incoming velocity before the return replaces it; lateral spacing lets players escape it.
 export function crowdedReturn(velocity,ball,player,profile,random=Math.random){
+ if(velocity.unforcedError)return velocity;
  const pace=Math.hypot(ball.vx,ball.vz),dx=ball.x-player.x,dz=ball.z-player.z;
  const crowd=clamp(1-Math.abs(dx)/.62,0,1)*clamp(1-Math.abs(dz)/1.6,0,1);
  const height=clamp((ball.y-.15)/.45,0,1)*clamp((2.35-ball.y)/.35,0,1);
