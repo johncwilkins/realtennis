@@ -4,19 +4,20 @@ import {mainWallRuns,wallFrame,mainWallSurface,venueRear} from './venue-walls.js
 import {architecturalGlass} from './window-glass.js';
 import {block,beam,finish} from './venue-tools.js';
 function stoneMap(){if(typeof document==='undefined')return null;const canvas=document.createElement('canvas');canvas.width=canvas.height=512;const c=canvas.getContext('2d');let seed=1940;const rnd=()=>((seed=(seed*1664525+1013904223)>>>0)/4294967296);c.fillStyle='#6c685f';c.fillRect(0,0,512,512);for(let y=0;y<512;y+=38)for(let x=-60+(y/38%2)*60;x<512;x+=94){c.fillStyle=['#a59c88','#948e80','#b0a692','#8b8579'][Math.floor(rnd()*4)];c.fillRect(x+2,y+2,90,34);c.fillStyle='#d6cbb329';c.fillRect(x+4,y+3,86,3);}const map=new THREE.CanvasTexture(canvas);map.colorSpace=THREE.SRGBColorSpace;map.wrapS=map.wrapT=THREE.RepeatWrapping;map.repeat.set(1,2);return map;}
+function recessMap(){if(typeof document==='undefined')return null;const canvas=document.createElement('canvas');canvas.width=128;canvas.height=256;const c=canvas.getContext('2d'),light=c.createLinearGradient(0,0,0,256);light.addColorStop(0,'#7d9395');light.addColorStop(.45,'#c4c8b2');light.addColorStop(1,'#71877a');c.fillStyle=light;c.fillRect(0,0,128,256);c.fillStyle='#384f4a33';for(const x of [9,73,112]){c.fillRect(x,90,3,166);c.beginPath();c.moveTo(x,110);c.lineTo(x-17,77);c.lineTo(x+2,98);c.lineTo(x+17,57);c.lineTo(x+3,125);c.fill();}const map=new THREE.CanvasTexture(canvas);map.colorSpace=THREE.SRGBColorSpace;return map;}
 export function buildCameronHall(){
  const sides=new THREE.Group(),ends=[],walls=new THREE.Group(),rafters=[];sides.add(walls);sides.userData.cameronHall=true;
- const blue=finish('#063b92'),darkBlue=finish('#092951'),ivory=finish('#d2cbbb'),stone=finish('#b8b0a0',{map:stoneMap()}),steel=finish('#3d454a',{metalness:.45,roughness:.7}),glass=architecturalGlass(.33),lamp=new THREE.MeshBasicMaterial({color:'#fff0cf'});
+ const blue=finish('#063b92'),ivory=finish('#d2cbbb'),stone=finish('#b8b0a0',{map:stoneMap()}),steel=finish('#3d454a',{metalness:.45,roughness:.7}),glass=architecturalGlass(.22),backing=new THREE.MeshBasicMaterial({map:recessMap(),color:'#e0e3d1',side:THREE.DoubleSide}),lamp=new THREE.MeshBasicMaterial({color:'#fff0cf'});
+ glass.transmission=.55;glass.roughness=.12;
  function panel(span){const g=new THREE.Group(),count=Math.max(1,Math.floor(span/3)),step=span/count;
-  block(g,span,1.1,.19,0,3.95,-.10,blue);block(g,span,.10,.23,0,4.52,.015,ivory);block(g,span,.16,.28,0,8.85,-.02,stone);
+  block(g,span,1.1,.19,0,3.95,-.10,stone);block(g,span,.10,.23,0,4.52,.015,ivory);block(g,span,.16,.28,0,8.85,-.02,stone);
   // Recessed glazing is built into real openings, with stone piers between them.
-  for(let i=0;i<count;i++){const x=-span/2+(i+.5)*step,w=step-.32;block(g,.28,4.18,.35,x-step/2+.14,6.7,-.12,stone);block(g,w,.90,.20,x,4.98,-.12,ivory);block(g,w,1.18,.20,x,8.18,-.12,ivory);
-   const pane=new THREE.Mesh(new THREE.PlaneGeometry(w,2.1),glass);pane.position.set(x,6.48,-.21);pane.userData.cameronWindow=true;g.add(pane);
+  for(let i=0;i<count;i++){const x=-span/2+(i+.5)*step,w=step-.32;block(g,.28,4.18,.35,x-step/2+.14,6.7,-.12,stone);block(g,w,.90,.20,x,4.98,-.12,stone);block(g,w,1.18,.20,x,8.18,-.12,stone);
+   const pane=new THREE.Mesh(new THREE.PlaneGeometry(w,2.1),glass);pane.position.set(x,6.48,-.21);pane.userData.cameronWindow=true;g.add(pane);const view=new THREE.Mesh(new THREE.PlaneGeometry(w+.03,2.12),backing);view.position.set(x,6.48,-.73);view.userData.cameronWindowBackdrop=true;g.add(view);for(const side of [-1,1])block(g,.055,2.14,.60,x+side*w/2,6.48,-.43,stone);
    for(const dx of [-w/2,0,w/2])beam(g,[x+dx,5.42,-.10],[x+dx,7.54,-.10],.025,steel);for(const y of [5.42,6.48,7.54])beam(g,[x-w/2,y,-.10],[x+w/2,y,-.10],.025,steel);
    block(g,w+.10,.10,.34,x,5.36,-.05,stone);
-   // Plain blue/ivory hanging fabric evokes the arena rafters without text or signs.
-   const banner=block(g,Math.min(.65,w*.6),.95,.025,x,8.0,.055,i%2?ivory:blue);banner.userData.cameronColorPanel=true;
-  }block(g,.24,4.18,.35,span/2-.12,6.7,-.12,stone);return g;
+
+  }block(g,.24,4.18,.35,span/2-.12,6.7,-.12,stone);g.traverse(o=>{if(o.isMesh&&o.material===stone){o.geometry=o.geometry.clone();const uv=o.geometry.attributes.uv;for(let n=0;n<uv.count;n++)uv.setXY(n,uv.getX(n)*Math.max(.2,o.scale.x/2),uv.getY(n)*Math.max(.2,o.scale.y/2));}});return g;
  }
  for(const run of mainWallRuns()){const frame=wallFrame(run);frame.add(panel(Math.hypot(run.xb-run.xa,run.b-run.a)));walls.add(frame);mainWallSurface(sides,run,3.17,3.38,blue);}
  const left=panel(venueRear+C.halfLength);left.position.set(C.roofOuterX,0,(venueRear-C.halfLength)/2);left.rotation.y=Math.PI/2;walls.add(left);
