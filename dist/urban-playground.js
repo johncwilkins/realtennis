@@ -1,3 +1,4 @@
+import {buildPlaygroundLighting} from './playground-lighting.js';
 import {sprayTag,scrawlTag} from './spray-graffiti.js';
 import {buildBasketballLot} from './playground-basketball.js';
 import * as THREE from './three.module.js';
@@ -26,7 +27,7 @@ export function urbanLinePaintMap(){return canvasMap(512,32,(c,w,h)=>{const rnd=
 export function setUrbanWallUV(mesh){const p=mesh.geometry?.attributes.position,uv=mesh.geometry?.attributes.uv;if(!p||!uv)return;mesh.updateWorldMatrix(true,false);const v=new THREE.Vector3(),normal=new THREE.Vector3().fromBufferAttribute(mesh.geometry.attributes.normal,0).transformDirection(mesh.matrixWorld),alongZ=Math.abs(normal.x)>Math.abs(normal.z);for(let i=0;i<p.count;i++){v.fromBufferAttribute(p,i).applyMatrix4(mesh.matrixWorld);uv.setXY(i,(alongZ?v.z:v.x)/48,v.y/3.4);}uv.needsUpdate=true;}
 export const PLAYGROUND_BACKDROP={bottom:-24,top:42,extent:72,cornerOverlap:3.45,setback:3.2};
 export function buildUrbanPlayground(){
- let frontageSeed=409;const sides=new THREE.Group(),ends=[],upper=new THREE.Group();sides.add(upper);sides.userData.urbanPlayground=true;
+ let frontageSeed=409;const sides=new THREE.Group(),ends=[],upper=new THREE.Group();sides.add(upper);const lighting=buildPlaygroundLighting();sides.add(lighting.group);sides.userData.urbanPlayground=true;
  const cornerBrick=finish('#b9b7a8',{map:apartmentMap(false),side:THREE.DoubleSide}),apartmentGlass=apartmentGlassMaterial(),brick=finish('#b9b7a8',{map:apartmentMap(),side:THREE.DoubleSide}),iron=finish('#687775',{metalness:.65,roughness:.68}),coping=finish('#9c9d8e'),wallMap=urbanGraffitiMap(),lineMap=urbanLinePaintMap();
  function fence(span){const g=new THREE.Group(),vertices=[],bottom=3.48,top=5.75,step=.22;for(const slope of [-1,1])for(let x=-span/2-(top-bottom);x<span/2+(top-bottom);x+=step){let y0=bottom,y1=top;const at=y=>x+slope*(y-bottom);if(slope===1){y0=Math.max(y0,bottom-span/2-x);y1=Math.min(y1,bottom+span/2-x);}else{y0=Math.max(y0,bottom+x-span/2);y1=Math.min(y1,bottom+x+span/2);}if(y1>y0)vertices.push(at(y0),y0,.045,at(y1),y1,.045);}
  const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));const mesh=new THREE.LineSegments(geo,new THREE.LineBasicMaterial({color:'#829491',transparent:true,opacity:.6}));mesh.userData.chainLink=true;g.add(mesh);for(let x=-span/2;x<=span/2+.01;x+=Math.max(.1,span/Math.ceil(span/3))){beam(g,[x,3.35,.04],[x,5.85,.04],.035,iron);}for(const y of [3.52,5.78])beam(g,[-span/2,y,.04],[span/2,y,.04],.032,iron);return g;
@@ -51,5 +52,5 @@ export function buildUrbanPlayground(){
 
  // Asphalt continues beneath the cutaway court instead of exposing background sky.
  const ground=new THREE.Mesh(new THREE.PlaneGeometry(180,180),finish('#3e4841'));ground.rotation.x=-Math.PI/2;ground.position.y=-.35;ground.userData.playgroundGround=true;upper.add(ground);
- return {sides,ends,wallMap,lineMap,setVisible(on,overview=false){sides.visible=on;upper.visible=!overview;for(const g of ends)g.visible=on&&!overview;},setEndView(){},update(){}};
+ return {sides,ends,wallMap,lineMap,setNight(on){lighting.setNight(on);},setVisible(on,overview=false){sides.visible=on;upper.visible=!overview;for(const g of ends)g.visible=on&&!overview;},setEndView(){},update(){}};
 }
