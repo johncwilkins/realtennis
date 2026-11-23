@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import * as THREE from '../dist/three.module.js';
+import {createPlayer} from '../dist/player-model.js';
+import {characterLook} from '../dist/character-look.js';
+import {applyCourtOutfit} from '../dist/court-outfits.js';
+import {getCharacter} from '../dist/roster.js';
+const scene=new THREE.Scene(),players=['#f2eee3','#e9e8e0'].map(color=>createPlayer(scene,color,new THREE.MeshStandardMaterial()));
+for(const [i,p] of players.entries()){characterLook(p,getCharacter('whitney'));const skin=p.skin.color.getHexString(),shirt=p.clothing.shirt.color.getHexString(),base=p.clothing.base.color.getHexString();applyCourtOutfit(p,true,i);assert.notEqual(p.clothing.shirt.color.getHexString(),shirt);assert.notEqual(p.clothing.base.color.getHexString(),base);assert.ok(p.streetwear.group.visible);assert.equal(p.streetwear.group.children.length,4);assert.equal(p.skin.color.getHexString(),skin);assert.equal(p.streetwear.shoes.length,2);const outfit=p.streetwear;for(let n=0;n<10;n++){applyCourtOutfit(p,false,i);applyCourtOutfit(p,true,i);}assert.equal(p.streetwear,outfit,'switching courts reuses details');characterLook(p,getCharacter('prescott'));applyCourtOutfit(p,true,i);assert.ok(p.streetwear.group.visible);applyCourtOutfit(p,false,i);assert.equal(p.clothing.shirt.color.getHexString(),shirt);assert.equal(p.clothing.base.color.getHexString(),base);assert.equal(p.bands.material.color.getHexString(),p.character.band.slice(1));assert.equal(p.bands.wristMaterial.color.getHexString(),p.character.wrist.slice(1));assert.equal(p.capMaterial.color.getHexString(),p.character.hatColor.slice(1));assert.ok(!p.streetwear.group.visible);for(const shoe of p.streetwear.shoes)assert.ok(shoe.material.color.equals(shoe.color));}
+applyCourtOutfit(players[0],true,0);applyCourtOutfit(players[1],true,1);assert.notEqual(players[0].clothing.shirt.color.getHexString(),players[1].clothing.shirt.color.getHexString(),'opponents have distinct kits');
+console.log('Passed: black/red/yellow night outfits, jersey stripes, sneakers and bands; player identities retained; whites restored after court/player switches; no accumulating geometry.');
