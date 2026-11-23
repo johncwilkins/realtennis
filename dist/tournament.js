@@ -17,6 +17,7 @@ export class Tournament {
  toJSON(){return {version:2,entrants:this.entrants,config:this.config,courts:this.courts,results:this.results};}
  static fromJSON(raw){
   if(!raw||![1,2].includes(raw.version)||!raw.results||typeof raw.results!=='object')throw Error('Invalid saved tournament.');
+  if(Array.isArray(raw.courts)&&raw.courts.includes('15')){if(raw.courts.length!==7||new Set(raw.courts).size!==7)throw Error('Invalid saved courts.');const replacement=Object.keys(COURT_SCHEMES).find(id=>!raw.courts.includes(id));raw={...raw,courts:raw.courts.map(id=>id==='15'?replacement:id)};}
   const t=new Tournament(raw);
   if(raw.version===1){
    // Validate the old bracket before removing prematurely simulated later rounds.
