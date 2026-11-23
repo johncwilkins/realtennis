@@ -1,4 +1,5 @@
 import * as THREE from './three.module.js';
+import {COURT as C} from './court-geometry.js';
 import {block,beam,finish} from './venue-tools.js';
 // Shared geometry: only artificial illumination changes between the two playgrounds.
 export function buildPlaygroundLighting(){
@@ -15,6 +16,7 @@ export function buildPlaygroundLighting(){
  for(const x of [-5.65,5.65])for(const z of [-8,8])flood(x,7.4,z,x<0?-1.3:1.3,z*.7);
  for(const z of [-12,12])flood(31,9,z,20,z*.55,true);
  const spill=new THREE.PointLight('#e9b781',34,25,2);spill.position.set(11,3.8,0);spill.userData.basketballSpill=true;group.add(spill);lights.push(spill);
+ for(const side of [-1,1]){const wash=new THREE.PointLight('#ffe2b5',22,12,2);wash.position.set(0,4.2,side*((side>0?C.halfLength:C.endRoofInner)-2.2));wash.userData.playgroundEndWash=side;group.add(wash);lights.push(wash);}
  group.visible=false;return {group,fixtures,lights,setNight(on){group.visible=Boolean(on);}};
 }
 export function setSceneNight({hemisphere,ambient,sun,fill,renderer},night,sunny=false){
