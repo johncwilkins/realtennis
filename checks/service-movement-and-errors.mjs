@@ -1,18 +1,18 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import * as THREE from '../dist/three.module.js';
-import {movePlayer} from '../dist/controls.js';
+import {movePlayer,WheelStroke} from '../dist/controls.js';
 import {pointerReach} from '../dist/mouse-setup.js';
 import {skillShot} from '../dist/athlete.js';
 import {COURT_SCHEMES} from '../dist/court-schemes.js';
 const source=fs.readFileSync(new URL('../dist/game.js',import.meta.url),'utf8');
 const camera=new THREE.PerspectiveCamera(44,1.5,.1,200);camera.position.set(0,13.5,30);camera.lookAt(0,0,0);camera.updateMatrixWorld();
-const ctx={THREE,camera,ray:new THREE.Raycaster(),pointer:new THREE.Vector2(),plane:new THREE.Plane(new THREE.Vector3(0,1,0),0),intersection:new THREE.Vector3(),paused:false,pauseModal:false,mode:'serveWalk',match:{servicePlayer:1},humanSide:()=>1,playDepth:()=>13,wallX:()=>5,clamp:(v,a,b)=>Math.max(a,Math.min(b,v)),innerWidth:1200,innerHeight:800,mouseSettings:{reach:1},pointerReach,players:[{target:new THREE.Vector3(),g:{position:new THREE.Vector3()},energy:100,character:{}}],handPredictionTimer:1};
+const ctx={stroke:new WheelStroke(),THREE,camera,ray:new THREE.Raycaster(),pointer:new THREE.Vector2(),plane:new THREE.Plane(new THREE.Vector3(0,1,0),0),intersection:new THREE.Vector3(),paused:false,pauseModal:false,mode:'serveWalk',match:{servicePlayer:1},humanSide:()=>1,playDepth:()=>13,wallX:()=>5,clamp:(v,a,b)=>Math.max(a,Math.min(b,v)),innerWidth:1200,innerHeight:800,mouseSettings:{reach:1},pointerReach,players:[{target:new THREE.Vector3(),g:{position:new THREE.Vector3()},energy:100,character:{}}],handPredictionTimer:1};
 const pointerCode=source.slice(source.indexOf('let latestPointer='),source.indexOf('function wheelInput('));
 const input=Function('ctx','with(ctx){'+pointerCode+';return {moveToPointer,applyPointerTarget};}')(ctx);
 for(const mode of ['serveWalk','serveToss']){ctx.mode=mode;ctx.players[0].target.set(0,0,0);input.moveToPointer({clientX:780,clientY:500,pointerType:'mouse'});assert.ok(ctx.players[0].target.x>.5,`receiver can reposition in ${mode}`);const p={x:0,z:3,vx:0,vz:0};movePlayer(p,ctx.players[0].target,.06);assert.ok(p.x>0,'target produces actual footwork');}
 ctx.match.servicePlayer=0;ctx.players[0].target.set(0,0,7);input.moveToPointer({clientX:420,clientY:500,pointerType:'mouse'});assert.equal(ctx.players[0].target.x,0,'own toss stays at the service spot');
-Object.assign(ctx,{applyPointerTarget:input.applyPointerTarget,serveAction:{server:0,launched:false,delivery:{x:0,y:2,z:7}},court:{},practice:true,faults:0,rally:5,stroke:{reset(){}},aiReaction:0,profileFor:()=>({reaction:.2}),ball:null,trail:{visible:false},beep(){},trailPoints:[]});
+Object.assign(ctx,{applyPointerTarget:input.applyPointerTarget,serveAction:{server:0,launched:false,delivery:{x:0,y:2,z:7}},court:{},practice:true,faults:0,rally:5,stroke:new WheelStroke(),aiReaction:0,profileFor:()=>({reaction:.2}),ball:null,trail:{visible:false},beep(){},trailPoints:[]});
 const releaseCode=source.slice(source.indexOf('function releaseService('),source.indexOf('function tickService('));
 Function('ctx','with(ctx){'+releaseCode+';releaseService();}')(ctx);
 assert.equal(ctx.mode,'rally');assert.ok(ctx.players[0].target.x<-.5,'release applies saved pointer without any new mouse event');
