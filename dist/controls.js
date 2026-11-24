@@ -18,6 +18,7 @@ export class WheelStroke{
  if(time-this.lastForward>650&&this.position>=0){this.armed=false;this.forward=false;this.draw=0;this.position=0;}
  if(this.hit)this.activeUntil=0;
  }
+ pointerGain(time){if(this.hit)return time<this.contactUntil+55?.25:1;if(!this.armed)return 1;if(this.forward&&time<Math.max(this.lastForward+180,this.activeUntil+70))return this.power>.65?.10:.20;if(!this.forward&&time<this.lastEvent+180)return .50;return 1;}
  canHit(time,accuracy=50){const help=clamp((accuracy-50)/50,0,1);return this.armed&&!this.hit&&this.contactStarted&&time<=this.activeUntil+60*help&&this.pose>=-.01&&this.pose<=.65+.18*help;}
  consume(time=this.lastForward){this.hit=true;this.activeUntil=0;this.pose=0;this.contactUntil=time+95;}
 }
