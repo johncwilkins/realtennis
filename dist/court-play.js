@@ -1,6 +1,6 @@
 import {playDepth} from './court-geometry.js';
 // Plan against the same collision step used by the live rally. No scripted rebounds.
-export function traceCourtShot(from,velocity,stepPhysics){const b={...from,...velocity,crossed:false,bounces:0,serve:false,roof:false,wallContacts:0,backContacts:0,roofContacts:0};let crossing=false,firstBounce=null;
+export function traceCourtShot(from,velocity,stepPhysics){const b={...from,...velocity,crossed:false,bounces:0,serve:false,roof:false,wallContacts:0,backContacts:0,roofContacts:0,endRoofContacts:0,endRoofReleased:false};let crossing=false,firstBounce=null;
  for(let i=0;i<720;i++){const before=b.bounces,stop=stepPhysics(b,1/120,false);crossing ||= b.crossed;if(!firstBounce&&b.bounces>before)firstBounce={x:b.x,z:b.z};if(stop)return {ball:b,crossing,firstBounce,time:(i+1)/120};}return {ball:b,crossing,firstBounce,time:6};}
 export function planCourtShot(from,opponent,side,stepPhysics,random=Math.random,tactics={}){
  const skill=(tactics.intelligence??100)/100,power=tactics.powerFactor??1;const choice=random(),route=choice<.30?'side-wall':choice<.50?'back-wall':choice<.67?'penthouse':'direct';let best=null;
@@ -16,3 +16,4 @@ export function planCourtShot(from,opponent,side,stepPhysics,random=Math.random,
  }
  return best;
 }
+
