@@ -7,20 +7,19 @@ export function movePlayer(state,target,dt,{maxSpeed=6.2,acceleration=14,braking
 }
 export class WheelStroke{
  constructor(){this.reset();}
- reset(){this.targetHoldUntil=0;this.energyCharged=false;this.position=0;this.pose=0;this.draw=0;this.armed=false;this.forward=false;this.contactStarted=false;this.pendingContact=false;this.contactUntil=0;this.activeUntil=0;this.lastEvent=-1000;this.lastForward=-1000;this.power=0;this.rawRate=0;this.rateSamples=[];this.hit=false;}
+ reset(){this.energyCharged=false;this.position=0;this.pose=0;this.draw=0;this.armed=false;this.forward=false;this.contactStarted=false;this.pendingContact=false;this.contactUntil=0;this.activeUntil=0;this.lastEvent=-1000;this.lastForward=-1000;this.power=0;this.rawRate=0;this.rateSamples=[];this.hit=false;}
  input(delta,time,rateScale=1){const units=Math.abs(delta);if(units<.01)return;const gap=clamp(time-this.lastEvent,1,250);this.lastEvent=time;
- if(delta>0){this.rateSamples=[];this.energyCharged=false;this.draw=clamp(Math.max(this.draw,-this.position)+units/300,0,1);this.position=-this.draw;this.armed=this.draw>=.08;this.targetHoldUntil=Math.max(this.targetHoldUntil,time+180);this.forward=false;this.pendingContact=false;this.contactStarted=false;this.contactUntil=0;this.activeUntil=0;this.hit=false;return;}
- if(!this.armed)return;if(!this.hit)this.targetHoldUntil=Math.max(this.targetHoldUntil,time+180);this.rateSamples.push({time,units,gap});this.rateSamples=this.rateSamples.filter(s=>time-s.time<160);const rate=this.rateSamples.reduce((n,s)=>n+s.units,0)/(this.rateSamples.reduce((n,s)=>n+s.gap,0)/1000),rawRate=rate/Math.max(.01,rateScale),p=clamp((rate-180)/3000,.08,1);this.rawRate=time-this.lastForward>220?rawRate:this.rawRate*.25+rawRate*.75;this.power=time-this.lastForward>220?p:this.power*.25+p*.75;this.lastForward=time;this.position=clamp(this.position+units/200,-1,1.1);this.forward=true;if(this.position>=0&&!this.contactStarted)this.pendingContact=true;
+ if(delta>0){this.rateSamples=[];this.energyCharged=false;this.draw=clamp(Math.max(this.draw,-this.position)+units/300,0,1);this.position=-this.draw;this.armed=this.draw>=.08;this.forward=false;this.pendingContact=false;this.contactStarted=false;this.contactUntil=0;this.activeUntil=0;this.hit=false;return;}
+ if(!this.armed)return;this.rateSamples.push({time,units,gap});this.rateSamples=this.rateSamples.filter(s=>time-s.time<160);const rate=this.rateSamples.reduce((n,s)=>n+s.units,0)/(this.rateSamples.reduce((n,s)=>n+s.gap,0)/1000),rawRate=rate/Math.max(.01,rateScale),p=clamp((rate-180)/3000,.08,1);this.rawRate=time-this.lastForward>220?rawRate:this.rawRate*.25+rawRate*.75;this.power=time-this.lastForward>220?p:this.power*.25+p*.75;this.lastForward=time;this.position=clamp(this.position+units/200,-1,1.1);this.forward=true;if(this.position>=0&&!this.contactStarted)this.pendingContact=true;
  }
  tick(time,dt){if(time<this.contactUntil){this.pose=0;return;}
  const desired=this.position,step=(this.forward?7+12*this.power:8)*dt,next=this.pose+clamp(desired-this.pose,-step,step);
- if(this.pendingContact&&this.pose<=0&&next>=0){this.pose=0;this.contactStarted=true;this.pendingContact=false;this.activeUntil=time+280;this.contactUntil=time+110;this.targetHoldUntil=this.activeUntil+90;}else this.pose=next;
+ if(this.pendingContact&&this.pose<=0&&next>=0){this.pose=0;this.contactStarted=true;this.pendingContact=false;this.activeUntil=time+280;this.contactUntil=time+110;}else this.pose=next;
  if(time-this.lastForward>650&&this.position>=0){this.armed=false;this.forward=false;this.draw=0;this.position=0;}
  if(this.hit)this.activeUntil=0;
  }
  canHit(time,accuracy=50){const help=clamp((accuracy-50)/50,0,1);return this.armed&&!this.hit&&this.contactStarted&&time<=this.activeUntil+60*help&&this.pose>=-.01&&this.pose<=.65+.18*help;}
- movementHeld(time){return time<this.targetHoldUntil;}
- consume(time=this.lastForward){this.targetHoldUntil=time+140;this.hit=true;this.activeUntil=0;this.pose=0;this.contactUntil=time+95;}
+ consume(time=this.lastForward){this.hit=true;this.activeUntil=0;this.pose=0;this.contactUntil=time+95;}
 }
 // Feet must have settled before the stroke; swing-time braking alone is not enough.
 // Contact is beside the body at comfortable extension, rather than crowded or stretched.
