@@ -31,17 +31,17 @@ export function buildHeritageCourt(id){if(!HERITAGE_IDS.includes(id))throw Error
   const top=kind==='15'?5.5:kind==='17'?4.5:6.4;const wall=block(g,span,top-3.4,.22,0,(top+3.4)/2,-.12,rough);wall.userData.heritageUpperWall=true;wall.geometry=wall.geometry.clone();const wallUV=wall.geometry.attributes.uv;for(let j=0;j<wallUV.count;j++)wallUV.setXY(j,wallUV.getX(j)*span/4,wallUV.getY(j)*(top-3.4)/2);block(g,span,.14,.42,0,top,.01,stone);
   if(kind==='15'){const leaves=new THREE.Mesh(new THREE.PlaneGeometry(span,3.2),ivy);leaves.position.set(0,3.9,.018);const uv=leaves.geometry.attributes.uv;for(let n=0;n<uv.count;n++)uv.setX(n,uv.getX(n)*span/3);leaves.userData.wrigleyIvy=true;g.add(leaves);railing(g,span,6.5);}
   if(kind==='17'){
-   // Sparse, continuous curved handrails and evenly spaced treads descend to the pool floor.
+   // Short ladders hang just beneath the coping, safely above player height.
    const count=span>5?Math.max(1,Math.floor(span/12)):0;for(let i=0;i<count;i++){const x=-span/2+(i+.5)*span/count,ladder=new THREE.Group();ladder.position.x=x;ladder.userData.poolLadder=true;g.add(ladder);
-    for(const side of [-1,1]){const X=side*.32,V=(y,z)=>new THREE.Vector3(X,y,z),path=new THREE.CurvePath();path.add(new THREE.QuadraticBezierCurve3(V(.42,.27),V(.45,.43),V(.70,.43)));path.add(new THREE.LineCurve3(V(.70,.43),V(4.45,.43)));path.add(new THREE.CubicBezierCurve3(V(4.45,.43),V(5.3,.43),V(5.3,-.36),V(4.45,-.36)));const rail=new THREE.Mesh(new THREE.TubeGeometry(path,96,.032,10,false),iron);rail.userData.ladderRail=true;ladder.add(rail);}
-    for(let y=.70;y<=4.35;y+=.29){const tread=block(ladder,.64,.045,.13,0,y,.43,iron);tread.userData.ladderTread=true;}
+    for(const side of [-1,1]){const X=side*.32,V=(y,z)=>new THREE.Vector3(X,y,z),path=new THREE.CurvePath();path.add(new THREE.QuadraticBezierCurve3(V(3.65,.27),V(3.68,.43),V(3.80,.43)));path.add(new THREE.LineCurve3(V(3.80,.43),V(4.45,.43)));path.add(new THREE.CubicBezierCurve3(V(4.45,.43),V(5.3,.43),V(5.3,-.36),V(4.45,-.36)));const rail=new THREE.Mesh(new THREE.TubeGeometry(path,96,.032,10,false),iron);rail.userData.ladderRail=true;ladder.add(rail);}
+    for(let y=3.80;y<=4.35;y+=.25){const tread=block(ladder,.64,.045,.13,0,y,.43,iron);tread.userData.ladderTread=true;}
    }for(let x=-span/2+.3;x<span/2;x+=2.4)for(let n=0;n<3;n++)beam(g,[x,4.55,0],[x+(n-1)*.12,4.8+n*.10,.04],.012,finish('#606747'));
   }
   if(kind==='18'){railing(g,span,7.4);for(let x=-span/2+.6;x<span/2;x+=3){block(g,.26,.25,.35,x,6.6,.02,iron);block(g,.48,.10,.25,x,6.74,.02,iron);beam(g,[x,3.5,.04],[x,6.3,.04],.035,iron);for(let y=3.6;y<6.3;y+=.3)beam(g,[x-.23,y,.05],[x+.23,y,.05],.022,iron);}}
   return g;
  }
- for(const run of mainWallRuns()){const frame=wallFrame(run),span=Math.hypot(run.xb-run.xa,run.b-run.a);if(id!=='19')frame.add(panel(span));if(id==='19'){// Low canal parapet; the actual buildings stand beyond it.
-   block(frame,span,.28,.28,0,3.55,0,stone);railing(frame,span,4.4);
+ for(const run of mainWallRuns()){const frame=wallFrame(run),span=Math.hypot(run.xb-run.xa,run.b-run.a);if(id!=='19')frame.add(panel(span));if(id==='19'){// The visible canal-side wall reaches the same out line as the ball collision wall.
+   const canalWall=mainWallSurface(sides,run,3.4,6.1,rough);canalWall.userData.canalCourtWall=true;setHeritageWallUV(canalWall);block(frame,span,.14,.30,0,6.12,0,stone);
   }upper.add(frame);mainWallSurface(sides,run,3.16,3.38,id==='16'?brass:stone);}
  const left=panel(venueRear+C.halfLength);left.position.set(C.roofOuterX,0,(venueRear-C.halfLength)/2);left.rotation.y=Math.PI/2;upper.add(left);
  for(const side of [-1,1]){const g=new THREE.Group(),z=side>0?venueRear:-C.halfLength,span=wallX(z)-C.roofOuterX;g.userData.endSide=side;const p=panel(span);p.position.set((wallX(z)+C.roofOuterX)/2,0,z);p.rotation.y=side>0?Math.PI:0;g.add(p);ends.push(g);}
