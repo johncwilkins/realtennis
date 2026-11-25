@@ -7,7 +7,7 @@ export const CONTROL_LESSON=[
  {id:'drive',title:'Choose a drive',text:'A drive hits with more power than a regular shot and uses more energy in a match. Energy stays full during this lesson. While a feed is coming, left-click once on the court, or tap Drive, then swing normally. You can click before scrolling; the choice applies to one successful shot.',success:'Drive hit. The next shot automatically returns to Regular.'},
  {id:'lob',title:'Choose a lob',text:'While a feed is coming, right-click once anywhere on the court, or tap Lob. Then draw back and swing. You do not need to hold the mouse button.',success:'Lob hit. One click chooses one lob; mouse scroll wheel speed still controls power.'},
  {id:'serve',title:'Choose your serve',text:'Pick one of the five serve styles in the small panel at the bottom center of the court, then press Serve. He walks to the service position, tosses and swings. Long/short changes placement.',success:'Your serve reached the service penthouse. That is the service action.'},
- {id:'complete',title:'You are ready to play',text:'Move with the cursor, draw back and swing with the mouse scroll wheel. No click gives a regular shot; left selects one drive, right one lob. Use the bottom-center serve panel between points, or click the court to repeat your previous choice.'}
+ {id:'complete',title:'You are ready to play',text:'Move with the cursor, draw back and swing with the mouse scroll wheel. No click gives a regular shot; left selects one drive, double left-click a power drive, right one lob. Power drives add pace but cost more stamina and control. Use the bottom-center serve panel between points, or click the court to repeat your previous choice.'}
 ];
 export class ControlsTutorial{
  constructor(){this.active=false;this.index=0;this.done=false;this.returnMode='straight';this.target={x:1.8,z:7};}
@@ -24,3 +24,4 @@ export class ControlsTutorial{
 }
 // Screen-space placement shared by the serve panel and lesson marker.
 export function nearbyPanel(anchor,viewport,size){const pad=12,gap=22;let x=anchor.x+gap;if(x+size.width>viewport.width-pad)x=anchor.x-size.width-gap;const top=viewport.height<500?76:108,maxY=Math.max(top,viewport.height-size.height-95);return {x:Math.max(pad,Math.min(viewport.width-size.width-pad,x)),y:Math.max(top,Math.min(maxY,anchor.y-35))};}
+

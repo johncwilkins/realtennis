@@ -1,9 +1,9 @@
-import {PARDEE_SCHEME} from './pardee-hall.js';
+import {ALUMNI_SCHEME} from './alumni-gym.js';
 import {RUSTIC_SCHEMES} from './rustic-courts.js';
 import {HERITAGE_SCHEMES} from './heritage-schemes.js';
 import * as THREE from './three.module.js';
 import {COURT as C} from './court-geometry.js';
-export const COURT_SCHEMES={'22':PARDEE_SCHEME,...HERITAGE_SCHEMES,...RUSTIC_SCHEMES,
+export const COURT_SCHEMES={'22':ALUMNI_SCHEME,...HERITAGE_SCHEMES,...RUSTIC_SCHEMES,
  '14':{name:'Cameron Indoor',description:'Cameron-inspired blue at court level, warm maple, stone upper walls and piers, recessed transparent glazing with softly lit views and a low barrel roof of exposed steel trusses. Colors and structure, without signs or lettering.',floor:'maple',colors:{upper:'#c9c4b5',lower:'#244d8a',roof:'#606366',wood:'#a98b63',trim:'#f1ede2',ink:'#123b81',tape:'#ece7d8',cord:'#202832',out:'#b7c7dd'},sun:'#fff1d8'},
  '12':{name:'Playground · Day',description:'Warm sunshine and clear shadows across chain-link fencing, brick apartments and fire escapes above graffiti-covered concrete walls. Weathered asphalt, faded painted patches, scrapes and chipped yellow court lines.',floor:'asphalt',colors:{upper:'#c68f6b',lower:'#d4d0c2',roof:'#565f59',wood:'#65756b',trim:'#a9ae90',ink:'#e8c458',tape:'#cfbf83',cord:'#262d2b',out:'#d8b44f'},sun:'#fff1cc'},
  '13':{name:'Playground · Night',description:'After dark under warm floodlights above the chain-link fence, with light spilling in from the neighboring basketball court. The same chain-link fencing, brick apartments and fire escapes above graffiti-covered concrete walls. Weathered asphalt, faded painted patches, scrapes and chipped yellow court lines.',floor:'asphalt',colors:{upper:'#c68f6b',lower:'#d4d0c2',roof:'#565f59',wood:'#65756b',trim:'#a9ae90',ink:'#e8c458',tape:'#cfbf83',cord:'#262d2b',out:'#d8b44f'},sun:'#879fc1'},
