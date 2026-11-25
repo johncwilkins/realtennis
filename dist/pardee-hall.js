@@ -3,42 +3,48 @@ import {COURT as C,wallX} from './court-geometry.js';
 import {mainWallRuns,wallFrame,mainWallSurface,wallSurface,venueRear} from './venue-walls.js';
 import {architecturalGlass} from './window-glass.js';
 import {block,beam,finish} from './venue-tools.js';
-export const PARDEE_SCHEME={name:'Pardee Hall',description:'Pardee-inspired rusticated brownstone, pale sandstone window surrounds, widely spaced flush windows and a broad, steep slate mansard roofline. Maroon, ivory and warm hardwood take their color cues from Kirby’s basketball court. No signs or logos.',floor:'maple',sky:'#76858c',sun:'#fff0d7',colors:{upper:'#987a65',lower:'#71313f',roof:'#595e64',wood:'#74523c',trim:'#e2d5bc',ink:'#f1ead9',tape:'#ece1cd',cord:'#292932',out:'#963d4c'}};
+export const PARDEE_SCHEME={name:'Pardee Hall',description:'Pardee-inspired rusticated brownstone, pale sandstone window surrounds, a prominent blue-gray mansard roof band, raised corner roofs, pale crest trim and sparse gabled dormers. Maroon, ivory and warm hardwood take their color cues from Kirby’s basketball court. No signs or logos.',floor:'maple',sky:'#76858c',sun:'#fff0d7',colors:{upper:'#987a65',lower:'#71313f',roof:'#595e64',wood:'#74523c',trim:'#e2d5bc',ink:'#f1ead9',tape:'#ece1cd',cord:'#292932',out:'#963d4c'}};
 function masonryMap(){const canvas=document.createElement('canvas');canvas.width=canvas.height=512;const c=canvas.getContext('2d');let seed=1873;const rnd=()=>((seed=(seed*1664525+1013904223)>>>0)/4294967296);c.fillStyle='#51443c';c.fillRect(0,0,512,512);for(let row=0;row<10;row++)for(let x=(row%2)*-64;x<512;x+=128){const y=row*52;c.fillStyle=['#a1836e','#92745e','#ad8b72','#856b59'][Math.floor(rnd()*4)];c.fillRect(x+2,y+2,124,48);c.fillStyle='#e5cfaa42';c.fillRect(x+3,y+3,122,3);c.fillStyle='#332c244d';c.fillRect(x+3,y+45,122,4);for(let n=0;n<70;n++){c.fillStyle=n%2?'#2c252018':'#f7dfbb20';c.fillRect(x+rnd()*124,y+rnd()*44+3,2+rnd()*9,1+rnd()*3);}}const map=new THREE.CanvasTexture(canvas);map.colorSpace=THREE.SRGBColorSpace;map.wrapS=map.wrapT=THREE.RepeatWrapping;return map;}
 function windowView(){const canvas=document.createElement('canvas');canvas.width=128;canvas.height=256;const c=canvas.getContext('2d'),g=c.createLinearGradient(0,0,0,256);g.addColorStop(0,'#78909b');g.addColorStop(.55,'#a3aba0');g.addColorStop(1,'#465b50');c.fillStyle=g;c.fillRect(0,0,128,256);c.fillStyle='#283c3440';for(const x of [15,93]){c.fillRect(x,95,4,161);for(let y=110;y<230;y+=29){c.beginPath();c.ellipse(x,y,23,36,.3,0,Math.PI*2);c.fill();}}const map=new THREE.CanvasTexture(canvas);map.colorSpace=THREE.SRGBColorSpace;return map;}
-function archShape(w,h){const s=new THREE.Shape();s.moveTo(-w/2,0);s.lineTo(w/2,0);s.lineTo(w/2,h-.28);s.quadraticCurveTo(0,h+.28,-w/2,h-.28);s.closePath();return s;}
 export function buildPardeeHall(){
  const sides=new THREE.Group(),walls=new THREE.Group(),ends=[];sides.userData.pardeeHall=true;sides.add(walls);
- const stone=finish('#ffffff',{map:masonryMap()}),trim=finish('#dfd1b7'),slate=finish('#454c55'),iron=finish('#3c3b3c',{metalness:.4}),maroon=finish('#71313f'),glass=architecturalGlass(.24),backing=new THREE.MeshBasicMaterial({map:windowView(),side:THREE.DoubleSide});glass.transmission=.55;
+ const stone=finish('#ffffff',{map:masonryMap()}),trim=finish('#dfd1b7'),slate=finish('#748697'),iron=finish('#3c3b3c',{metalness:.4}),maroon=finish('#71313f'),glass=architecturalGlass(.24),backing=new THREE.MeshBasicMaterial({map:windowView(),side:THREE.DoubleSide});glass.transmission=.55;
  // The original collision walls stay intact; this map gives their maroon finish a fine grain.
  const wallMap=masonryMap();wallMap.repeat.set(.5,.5);
- function window(g,x,y,w=1.05,h=1.35){
-  // Flat stone trim and shallow glazing read as a continuous, predictable wall face.
-  const shape=archShape(w+.16,h+.12),hole=new THREE.Path();hole.moveTo(-w/2,.04);hole.lineTo(-w/2,h-.28);hole.quadraticCurveTo(0,h+.28,w/2,h-.28);hole.lineTo(w/2,.04);hole.closePath();shape.holes.push(hole);
-  const surround=new THREE.Mesh(new THREE.ShapeGeometry(shape,12),trim);surround.position.set(x,y,-.012);surround.userData.pardeeWindowTrim=true;g.add(surround);
-  const geo=new THREE.ShapeGeometry(archShape(w,h),12),p=geo.attributes.position,uv=geo.attributes.uv;for(let i=0;i<uv.count;i++)uv.setXY(i,(p.getX(i)+w/2)/w,p.getY(i)/h);
-  const pane=new THREE.Mesh(geo,glass);pane.position.set(x,y,-.05);pane.userData.pardeeWindow=true;g.add(pane);const view=new THREE.Mesh(geo,backing);view.position.set(x,y,-.16);g.add(view);
-  for(const dx of [-w/2,0,w/2])block(g,.024,h-.16,.016,x+dx,y+(h-.16)/2,-.025,iron);block(g,w,.024,.016,x,y+h*.48,-.025,iron);block(g,w+.20,.065,.035,x,y-.01,-.015,trim);
- }
- function panel(span,pavilion=false){const g=new THREE.Group(),count=Math.max(1,Math.floor(span/5.8)),step=span/count;
-  block(g,span,2.7,.30,0,4.75,-.17,stone);block(g,span,.12,.12,0,6.1,-.04,trim);block(g,span,.11,.10,0,3.5,.02,maroon);
-  // Cut real arched openings through the masonry, with glass recessed behind the trim.
-  const face=new THREE.Shape();face.moveTo(-span/2,6.2);face.lineTo(span/2,6.2);face.lineTo(span/2,8.55);face.lineTo(-span/2,8.55);face.closePath();
-  if(span>=4.5)for(let i=0;i<count;i++){const x=-span/2+(i+.5)*step,w=Math.min(1.05,step-.52);for(const y of [6.65]){window(g,x,y,w);const hole=new THREE.Path();hole.moveTo(x-w/2,y);hole.lineTo(x-w/2,y+1.07);hole.quadraticCurveTo(x,y+1.63,x+w/2,y+1.07);hole.lineTo(x+w/2,y);hole.closePath();face.holes.push(hole);}}
-  const facade=new THREE.Mesh(new THREE.ExtrudeGeometry(face,{depth:.12,bevelEnabled:false,curveSegments:12}),stone);facade.position.z=-.14;g.add(facade);
-  for(const x of [-span/2+.12,span/2-.12])for(let y=3.5;y<8.5;y+=.4)block(g,.25,.34,.055,x,y,-.015,trim);
-  block(g,span+.14,.16,.22,0,8.56,-.015,trim);block(g,span+.3,.14,.30,0,8.74,-.025,trim);
-  // A tall, continuous double-pitch silhouette is the main architectural feature.
-  const roof=new THREE.Group();roof.userData.pardeeMansard=true;g.add(roof);const top=12.25;
-  wallSurface(roof,[[-span/2,8.85,-.05],[span/2,8.85,-.05],[span/2,top,-1.7],[-span/2,top,-1.7]],slate);
-  wallSurface(roof,[[-span/2,top,-1.7],[span/2,top,-1.7],[span/2,top+.18,-3.8],[-span/2,top+.18,-3.8]],slate);
-  for(const [y,z]of [[8.92,-.08],[12.25,-1.68]])block(roof,span+.14,.07,.11,0,y,z,iron);
-  // Sparse, shallow dormers sit against the slope rather than projecting like boxes.
-  if(span>=4.5)for(let i=0;i<count;i++){const x=-span/2+(i+.5)*step,dormer=new THREE.Group();dormer.userData.pardeeDormer=true;dormer.position.set(x,9.95,-.58);dormer.rotation.x=-Math.atan(1.65/3.4);roof.add(dormer);window(dormer,0,0,.55,.85);}
-  if(pavilion){const tower=new THREE.Group();tower.userData.pardeePavilion=true;g.add(tower);block(tower,3.1,3.25,.6,0,10.475,-.42,stone);const upperWindow=new THREE.Group();upperWindow.position.z=-.055;tower.add(upperWindow);window(upperWindow,0,10,.9,1.35);block(tower,3.35,.16,.8,0,12.14,-.4,trim);
-   wallSurface(tower,[[-1.73,12.25,-.04],[1.73,12.25,-.04],[1.22,14.25,-1.18],[-1.22,14.25,-1.18]],slate);block(tower,2.6,.13,1.8,0,14.3,-1.95,iron);
-   for(const x of [-1.17,0,1.17])beam(tower,[x,14.38,-1.17],[x,14.7,-1.17],.018,iron);beam(tower,[-1.23,14.65,-1.17],[1.23,14.65,-1.17],.018,iron);
+ // Roof faces are real sloped surfaces with openings, rather than a slab behind the dormers.
+ function roofBay(parent,{x,width,base=6.35,height=2.0,inset=.48,front=-.05,raised=false,dormer=true}){
+  const group=new THREE.Group();group.position.set(x,base,front);group.rotation.x=-Math.atan(inset/height);parent.add(group);
+  const length=Math.hypot(height,inset),topWidth=width*(raised?.78:1),shape=new THREE.Shape();shape.moveTo(-width/2,0);shape.lineTo(width/2,0);shape.lineTo(topWidth/2,length);shape.lineTo(-topWidth/2,length);shape.closePath();
+  if(dormer){const hole=new THREE.Path();hole.moveTo(-.38,.59);hole.lineTo(-.38,1.75);hole.lineTo(.38,1.75);hole.lineTo(.38,.59);hole.closePath();shape.holes.push(hole);}
+  const face=new THREE.Mesh(new THREE.ShapeGeometry(shape),slate);face.userData.pardeeSlateFace=true;group.add(face);
+  // Fine staggered slate joints leave the blue-gray color dominant.
+  for(let y=.22;y<length;y+=.28){const half=width/2+(topWidth-width)/2*y/length;for(const [a,b]of [[-half,-.48],[.48,half]])if(b>a)beam(group,[a,y,.004],[b,y,.004],.004,iron);}
+  for(const [a,b]of [[[-width/2,0,.012],[-topWidth/2,length,.012]],[[width/2,0,.012],[topWidth/2,length,.012]],[[-topWidth/2,length,.012],[topWidth/2,length,.012]]])beam(group,a,b,.045,trim);
+  const crest=block(parent,topWidth+.14,.10,.20,x,base+height+.04,front-inset,trim);crest.userData.pardeeRoofCrest=true;
+  wallSurface(parent,[[x-topWidth/2,base+height,front-inset],[x+topWidth/2,base+height,front-inset],[x+topWidth/2,base+height+.14,front-inset-1.5],[x-topWidth/2,base+height+.14,front-inset-1.5]],slate);
+  if(raised){group.userData.pardeeRaisedRoof=true;for(const edge of [-1,1])wallSurface(parent,[[x+edge*width/2,base,front],[x+edge*topWidth/2,base+height,front-inset],[x+edge*topWidth/2,base+height+.14,front-inset-1.5],[x+edge*width/2,base,front-1.5]],slate);}
+  if(dormer){const d=new THREE.Group();d.userData.pardeeDormer=true;group.add(d);
+   const pane=new THREE.Mesh(new THREE.PlaneGeometry(.76,1.16),glass);pane.position.set(0,1.17,.018);pane.userData.pardeeWindow=true;d.add(pane);const view=new THREE.Mesh(new THREE.PlaneGeometry(.76,1.16),backing);view.position.set(0,1.17,-.08);d.add(view);
+   for(const xx of [-.43,.43])block(d,.08,1.27,.035,xx,1.17,.04,trim);for(const yy of [.55,1.79])block(d,.94,.07,.04,0,yy,.04,trim);block(d,.025,1.16,.025,0,1.17,.04,iron);
+   // Pediments and slim pale braces are confined to the roof, above the playable walls.
+   for(const [a,b]of [[[ -.57,1.83,.06],[0,2.08,.06]],[[0,2.08,.06],[.57,1.83,.06]],[[-.67,.48,.015],[-.43,1.30,.035]],[[.67,.48,.015],[.43,1.30,.035]]])beam(d,a,b,.035,trim);
   }
+ }
+ function panel(span,pavilion=false){const g=new THREE.Group();
+  // A quiet, flat masonry band meets a strong cornice immediately above the real court wall.
+  block(g,span,2.7,.30,0,4.75,-.17,stone);block(g,span,.10,.10,0,6.1,-.035,trim);block(g,span,.11,.10,0,3.5,.02,maroon);
+  for(const x of [-span/2+.12,span/2-.12])for(let y=3.5;y<6.1;y+=.4)block(g,.25,.34,.055,x,y,-.015,trim);
+  block(g,span+.14,.13,.25,0,6.23,-.025,trim);
+  const roof=new THREE.Group();roof.userData.pardeeMansard=true;g.add(roof);
+  if(span<5)roofBay(roof,{x:0,width:span,height:2.6,dormer:false});
+  else{
+   const corner=Math.min(2.75,span*.23),middle=span-2*corner;
+   roofBay(roof,{x:-span/2+corner/2,width:corner,height:2.45,inset:.55,raised:true});
+   roofBay(roof,{x:span/2-corner/2,width:corner,height:2.45,inset:.55,raised:true});
+   const bays=Math.max(1,Math.floor(middle/5.8)),width=middle/bays;
+   for(let i=0;i<bays;i++)roofBay(roof,{x:-middle/2+(i+.5)*width,width});
+  }
+  if(pavilion){roof.userData.pardeePavilion=true;}
   // Keep rustication at a stable physical scale on every wall face.
   g.traverse(o=>{if(o.isMesh&&o.material===stone){o.geometry=o.geometry.clone();const uv=o.geometry.attributes.uv;for(let i=0;i<uv.count;i++)uv.setXY(i,uv.getX(i)*Math.max(.1,o.scale.x/3),uv.getY(i)*Math.max(.1,o.scale.y/1.2));}});return g;
  }
