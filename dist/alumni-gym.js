@@ -13,6 +13,9 @@ export function buildAlumniGym(){
  const sides=new THREE.Group(),upper=new THREE.Group(),ends=[],roofGroups=[],trackSides=new THREE.Group();sides.userData.alumniGym=true;sides.add(upper,trackSides);
  const plaster=finish('#ffffff',{map:texture('plaster')}),stone=finish('#e0d5be',{map:texture('stone')}),iron=finish('#454843',{metalness:.25,roughness:.78}),timber=finish('#635142',{map:texture('wood')}),ceiling=finish('#a39d8d',{map:texture('plaster'),side:THREE.DoubleSide}),track=finish('#76604d',{map:texture('wood')}),mark=finish('#b2a58a'),glass=architecturalGlass(.25),backing=new THREE.MeshBasicMaterial({map:litWindow(),color:'#b8c1b7',side:THREE.DoubleSide}),lamp=new THREE.MeshBasicMaterial({color:'#e8d7b2'});glass.transmission=.55;glass.roughness=.22;
  const wallMap=texture('plaster'),z0=-C.halfLength,z1=venueRear,outerL=-9.05,outerR=7.0,trackY=6.65,bank=Math.tan(7*Math.PI/180),shellZ0=z0-2.05,shellZ1=z1+2.05;
+ const xl=-7.8,xr=5.8,za=z0-.75,zb=z1+.75,r=(xr-xl)/2,cx=(xl+xr)/2,centerA=za+r,centerB=zb-r;
+ for(const side of [-1,1]){const group=new THREE.Group();group.userData.endSide=side;ends.push(group);}
+ const sections=[{a:shellZ0,b:centerA,parent:ends[0]},{a:centerA,b:centerB,parent:upper},{a:centerB,b:shellZ1,parent:ends[1]}];
  function facade(span){const g=new THREE.Group(),count=Math.max(1,Math.floor(span/4.6)),step=span/count,w=Math.min(1.7,step-.65);block(g,span,.38,.40,0,6.2,-.18,stone);block(g,span,.30,.45,0,9.35,-.18,stone);block(g,span,.12,.55,0,9.56,-.13,stone);
   for(let i=0;i<count;i++){const x=-span/2+(i+.5)*step;block(g,step-w,2.9,.34,x-step/2+(step-w)/2,7.8,-.18,plaster);block(g,w,.48,.34,x,6.55,-.18,stone);block(g,w,.36,.34,x,9.05,-.18,plaster);
    const pane=new THREE.Mesh(new THREE.PlaneGeometry(w-.14,2.10),glass);pane.position.set(x,7.82,-.19);pane.userData.alumniWindow=true;g.add(pane);const view=new THREE.Mesh(new THREE.PlaneGeometry(w-.1,2.14),backing);view.position.set(x,7.82,-.52);g.add(view);
@@ -21,14 +24,16 @@ export function buildAlumniGym(){
   for(const x of [-span/2+.16,span/2-.16]){block(g,.32,2.95,.42,x,7.8,-.08,stone);block(g,.46,.16,.46,x,9.19,-.05,stone);}
   return g;
  }
- const right=facade(shellZ1-shellZ0);right.position.set(outerR,0,(z1+z0)/2);right.rotation.y=-Math.PI/2;upper.add(right);const left=facade(shellZ1-shellZ0);left.position.set(outerL,0,(z1+z0)/2);left.rotation.y=Math.PI/2;upper.add(left);
- // Continuous outer masonry closes the void behind and below the raised track.
- for(const x of [outerL,outerR]){const wall=block(upper,.24,6.25,shellZ1-shellZ0,x,3.125,(shellZ0+shellZ1)/2,plaster);wall.userData.alumniShell=true;}
- // All playable side-wall sections follow the physical straight/angled/straight tambour profile.
- for(const run of mainWallRuns())mainWallSurface(sides,run,3.4,6.1,plaster);
- block(sides,.15,2.7,z1-z0,C.roofOuterX,4.75,(z1+z0)/2,plaster);
- for(const side of [-1,1]){const g=new THREE.Group(),z=side>0?z1:z0;g.userData.endSide=side;const face=facade(outerR-outerL);face.position.set((outerR+outerL)/2,0,z+side*2.05);face.rotation.y=side>0?Math.PI:0;g.add(face);const shell=block(g,outerR-outerL,6.25,.24,(outerR+outerL)/2,3.125,z+side*2.05,plaster);shell.userData.alumniShell=true;
-  const capGeo=new THREE.BufferGeometry();capGeo.setAttribute('position',new THREE.Float32BufferAttribute([outerL,9.5,z+side*2.05,outerR,9.5,z+side*2.05,(outerL+outerR)/2,10.82,z+side*2.05],3));capGeo.computeVertexNormals();const cap=new THREE.Mesh(capGeo,ceiling);cap.userData.alumniShell=true;g.add(cap);const width=wallX(z)-C.roofOuterX;block(g,width,2.7,.22,(wallX(z)+C.roofOuterX)/2,4.75,z+side*.05,plaster);ends.push(g);}
+ // Side architecture and each oval return share the same cutaway ownership.
+ // Removing the near return now removes its wall continuation at precisely the track tangent.
+ for(const {a,b,parent}of sections){const group=new THREE.Group();group.userData.alumniSideSection={a,b};parent.add(group);
+  for(const [x,rotation]of [[outerL,Math.PI/2],[outerR,-Math.PI/2]]){const face=facade(b-a);face.position.set(x,0,(a+b)/2);face.rotation.y=rotation;group.add(face);const wall=block(group,.24,6.25,b-a,x,3.125,(a+b)/2,plaster);wall.userData.alumniShell=true;}
+  // The visible playing-wall band and its outer shell stop together as well.
+  for(const run of mainWallRuns()){const lo=Math.max(a,run.a),hi=Math.min(b,run.b);if(hi>lo+.001)mainWallSurface(group,{a:lo,b:hi,xa:wallX(lo),xb:wallX(hi)},3.4,6.1,plaster);}
+  const lo=Math.max(a,z0),hi=Math.min(b,z1);if(hi>lo)block(group,.15,2.7,hi-lo,C.roofOuterX,4.75,(lo+hi)/2,plaster);
+ }
+ for(const side of [-1,1]){const g=ends.find(e=>e.userData.endSide===side),z=side>0?z1:z0;const face=facade(outerR-outerL);face.position.set((outerR+outerL)/2,0,z+side*2.05);face.rotation.y=side>0?Math.PI:0;g.add(face);const shell=block(g,outerR-outerL,6.25,.24,(outerR+outerL)/2,3.125,z+side*2.05,plaster);shell.userData.alumniShell=true;
+  const capGeo=new THREE.BufferGeometry();capGeo.setAttribute('position',new THREE.Float32BufferAttribute([outerL,9.5,z+side*2.05,outerR,9.5,z+side*2.05,(outerL+outerR)/2,10.82,z+side*2.05],3));capGeo.computeVertexNormals();const cap=new THREE.Mesh(capGeo,ceiling);cap.userData.alumniShell=true;g.add(cap);const width=wallX(z)-C.roofOuterX;block(g,width,2.7,.22,(wallX(z)+C.roofOuterX)/2,4.75,z+side*.05,plaster);}
  // A true oval: two long side galleries joined by uninterrupted semicircular ends.
  // Its deck and supports sit above the out-of-court wall height and outside the floor footprint.
  function ribbon(parent,points){const g=new THREE.Group();g.userData.alumniTrack=true;g.userData.deckHeight=trackY;g.userData.bankDegrees=7;g.userData.centerline=points;parent.add(g);const pos=[],uv=[],width=1.22;let distance=0;
@@ -41,7 +46,7 @@ export function buildAlumniGym(){
   }
   const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));geo.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));geo.computeVertexNormals();const deck=new THREE.Mesh(geo,track);deck.material.side=THREE.DoubleSide;deck.receiveShadow=deck.castShadow=true;deck.userData.alumniTrackDeck=true;g.add(deck);return g;
  }
- const xl=-7.8,xr=5.8,za=z0-.75,zb=z1+.75,r=(xr-xl)/2,cx=(xl+xr)/2,centerA=za+r,centerB=zb-r,straight=(x,zA,zB,nx,nz)=>{const count=Math.ceil(Math.abs(zB-zA)/.9)+1;return Array.from({length:count},(_,i)=>({x,z:zA+(zB-zA)*i/(count-1),nx,nz}));};
+ const straight=(x,zA,zB,nx,nz)=>{const count=Math.ceil(Math.abs(zB-zA)/.9)+1;return Array.from({length:count},(_,i)=>({x,z:zA+(zB-zA)*i/(count-1),nx,nz}));};
  ribbon(trackSides,straight(xl,centerA,centerB,-1,0));ribbon(trackSides,straight(xr,centerA,centerB,1,0));
  for(const side of [-1,1]){const end=ends.find(e=>e.userData.endSide===side),cz=side<0?centerA:centerB,points=[];for(let i=0;i<=64;i++){const angle=Math.PI+(side<0?1:-1)*Math.PI*i/64;points.push({x:cx+r*Math.cos(angle),z:cz+r*Math.sin(angle),nx:Math.cos(angle),nz:Math.sin(angle)});}const curve=ribbon(end,points);curve.userData.ovalEnd={cx,cz,r};}
  // Old painted steel trusses, timber purlins, suspension rods, and modest pendant fixtures.
@@ -54,6 +59,6 @@ export function buildAlumniGym(){
   for(const x of [-6,-3,0,3,6])beam(g,[x,10.6-Math.abs(x-mid)/7,z],[x,10.6-Math.abs(x-mid)/7,endZ],.038,timber);
  }
  // Give the shared unit boxes their own UVs before applying physical texture scale.
- sides.traverse(o=>{if(o.isMesh&&[stone,plaster,timber].includes(o.material)&&o.geometry.type==='BoxGeometry'){o.geometry=o.geometry.clone();const uv=o.geometry.attributes.uv;for(let i=0;i<uv.count;i++)uv.setXY(i,uv.getX(i)*Math.max(.1,o.scale.x/2),uv.getY(i)*Math.max(.1,o.scale.y/2));}});
+ for(const root of [sides,...ends])root.traverse(o=>{if(o.isMesh&&[stone,plaster,timber].includes(o.material)&&o.geometry.type==='BoxGeometry'){o.geometry=o.geometry.clone();const uv=o.geometry.attributes.uv;for(let i=0;i<uv.count;i++)uv.setXY(i,uv.getX(i)*Math.max(.1,o.scale.x/2),uv.getY(i)*Math.max(.1,o.scale.y/2));}});
  let active=false,overview=false;return {sides,ends,wallMap,setVisible(on,over=false){active=on;overview=over;sides.visible=on;upper.visible=trackSides.visible=!over;for(const g of ends)g.visible=on&&!over;},setEndView(side){for(const g of roofGroups)g.visible=active&&!overview&&g.userData.trussZ*side<2;},update(){}};
 }
